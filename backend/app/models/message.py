@@ -14,6 +14,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.crypto import EncryptedText
 from app.database import Base
+from app.timeutil import utcnow
 
 
 class Conversation(Base):
@@ -56,6 +57,6 @@ class Message(Base):
     attachment_key: Mapped[str | None] = mapped_column(String(32))
     attachment_type: Mapped[str | None] = mapped_column(String(10))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
