@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, File, Form, Header, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Header, Response, UploadFile
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import exists, func, or_, select, update
 from sqlalchemy.exc import IntegrityError
@@ -12,6 +12,7 @@ from app.api.deps import DB, CurrentUser
 from app.errors import ApiError
 from app.models import Application, Conversation, Message, Offer, OfficeMember, User
 from app.pagination import Page, Pagination, paginate
+from app.services.ia import IaClient, IaUnavailable, get_ia_client
 from app.timeutil import utcnow
 
 router = APIRouter(tags=["messages"])
@@ -21,6 +22,15 @@ CHUNK = 64 * 1024
 CONTEXT = b"messages.attachment"
 SIGNATURES = {b"\xff\xd8\xff": "jpeg", b"\x89PNG\r\n\x1a\n": "png"}
 MEDIA = {"jpeg": "image/jpeg", "png": "image/png"}
+MAX_AUDIO = 10 * 1024 * 1024
+AUDIO_MEDIA = {
+    "webm": "audio/webm",
+    "ogg": "audio/ogg",
+    "mp3": "audio/mpeg",
+    "m4a": "audio/mp4",
+    "wav": "audio/wav",
+}
+Ia = Annotated[IaClient | None, Depends(get_ia_client)]
 
 
 class OpenInput(BaseModel):
@@ -55,6 +65,9 @@ class MessagePublic(BaseModel):
     sender_id: uuid.UUID
     text: str | None = Field(validation_alias="body")
     has_photo: bool = False
+    has_audio: bool = False
+    transcript: str | None = None
+    transcript_status: str | None = None
     created_at: datetime
     read_at: datetime | None
 
@@ -119,7 +132,8 @@ def render(db, conversation: Conversation, user: User) -> ConversationPublic:
 
 def message_view(message: Message) -> MessagePublic:
     out = MessagePublic.model_validate(message)
-    out.has_photo = message.attachment_key is not None
+    out.has_photo = message.attachment_type in MEDIA
+    out.has_audio = message.attachment_type in AUDIO_MEDIA
     return out
 
 
@@ -281,7 +295,7 @@ def download_photo(message_id: uuid.UUID, user: CurrentUser, db: DB):
     conversation = db.get(Conversation, message.conversation_id) if message else None
     allowed = (
         conversation is not None
-        and message.attachment_key is not None
+        and message.attachment_type in MEDIA
         and user.id in (conversation.user_a, conversation.user_b)
     )
     if not allowed:
@@ -289,5 +303,149 @@ def download_photo(message_id: uuid.UUID, user: CurrentUser, db: DB):
     return Response(
         storage.get(message.attachment_key, CONTEXT),
         media_type=MEDIA[message.attachment_type],
+        headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
+    )
+
+
+def detect_audio(data: bytes) -> str | None:
+    if data.startswith(b"\x1a\x45\xdf\xa3"):
+        return "webm"
+    if data.startswith(b"OggS"):
+        return "ogg"
+    if data.startswith(b"ID3") or data[:2] in (b"\xff\xfb", b"\xff\xf3", b"\xff\xf2"):
+        return "mp3"
+    if data[4:8] == b"ftyp":
+        return "m4a"
+    if data.startswith(b"RIFF") and data[8:12] == b"WAVE":
+        return "wav"
+    return None
+
+
+def read_audio(upload: UploadFile) -> tuple[bytes, str]:
+    data = bytearray()
+    while chunk := upload.file.read(CHUNK):
+        data.extend(chunk)
+        if len(data) > MAX_AUDIO:
+            raise ApiError(413, "file_too_large", "Voice message exceeds 10 MB")
+    kind = detect_audio(bytes(data))
+    if kind is None:
+        raise ApiError(422, "not_audio", "Unsupported audio format")
+    return bytes(data), kind
+
+
+def transcribe(message: Message, ia: IaClient | None) -> None:
+    """Demande la transcription ; sans IA le vocal reste, la transcription est réessayable."""
+    audio = storage.get(message.attachment_key, CONTEXT)
+    try:
+        if ia is None:
+            raise IaUnavailable
+        message.transcript = ia.transcribe(audio, AUDIO_MEDIA[message.attachment_type])
+        message.transcript_status = "ready"
+    except IaUnavailable:
+        message.transcript, message.transcript_status = None, "unavailable"
+
+
+@router.post(
+    "/conversations/{conversation_id}/voice",
+    response_model=MessagePublic,
+    status_code=201,
+)
+def send_voice(
+    conversation_id: uuid.UUID,
+    user: CurrentUser,
+    db: DB,
+    ia: Ia,
+    file: Annotated[UploadFile, File()],
+    content_length: Annotated[int | None, Header()] = None,
+):
+    conversation = participant_conversation(db, conversation_id, user)
+    if content_length is not None and content_length > MAX_AUDIO + CHUNK:
+        raise ApiError(413, "file_too_large", "Voice message exceeds 10 MB")
+    data, kind = read_audio(file)
+    key = storage.put(data, CONTEXT)
+    message = Message(
+        conversation_id=conversation.id,
+        sender_id=user.id,
+        attachment_key=key,
+        attachment_type=kind,
+    )
+    transcribe(message, ia)
+    conversation.last_message_at = utcnow()
+    db.add(message)
+    try:
+        db.commit()
+    except Exception:
+        storage.delete(key)
+        raise
+    peer = (
+        conversation.user_b if conversation.user_a == user.id else conversation.user_a
+    )
+    realtime.publish(
+        [peer],
+        {
+            "type": "message.new",
+            "conversation_id": str(conversation.id),
+            "message_id": str(message.id),
+        },
+    )
+    return message_view(message)
+
+
+def own_voice_message(db, message_id: uuid.UUID, user: User) -> Message:
+    message = db.get(Message, message_id)
+    if (
+        message is None
+        or message.sender_id != user.id
+        or message.attachment_type not in AUDIO_MEDIA
+    ):
+        raise ApiError(404, "message_not_found", "Voice message not found")
+    return message
+
+
+@router.post("/messages/{message_id}/transcript/retry", response_model=MessagePublic)
+def retry_transcript(message_id: uuid.UUID, user: CurrentUser, db: DB, ia: Ia):
+    message = own_voice_message(db, message_id, user)
+    if message.transcript_status == "validated":
+        raise ApiError(409, "already_validated", "Transcript already validated")
+    transcribe(message, ia)
+    db.commit()
+    return message_view(message)
+
+
+class TranscriptValidation(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+
+    text: str | None = Field(default=None, min_length=1, max_length=20_000)
+
+
+@router.post("/messages/{message_id}/transcript/validate", response_model=MessagePublic)
+def validate_transcript(
+    message_id: uuid.UUID, body: TranscriptValidation, user: CurrentUser, db: DB
+):
+    """Validation humaine obligatoire : l'IA propose, l'auteur corrige et confirme (F5.3)."""
+    message = own_voice_message(db, message_id, user)
+    if message.transcript_status != "ready":
+        raise ApiError(409, "nothing_to_validate", "No transcript awaiting validation")
+    if body.text:
+        message.transcript = body.text
+    message.transcript_status = "validated"
+    db.commit()
+    return message_view(message)
+
+
+@router.get("/messages/{message_id}/audio")
+def download_audio(message_id: uuid.UUID, user: CurrentUser, db: DB):
+    message = db.get(Message, message_id)
+    conversation = db.get(Conversation, message.conversation_id) if message else None
+    allowed = (
+        conversation is not None
+        and message.attachment_type in AUDIO_MEDIA
+        and user.id in (conversation.user_a, conversation.user_b)
+    )
+    if not allowed:
+        raise ApiError(404, "audio_not_found", "Audio not found")
+    return Response(
+        storage.get(message.attachment_key, CONTEXT),
+        media_type=AUDIO_MEDIA[message.attachment_type],
         headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
     )

@@ -56,6 +56,8 @@ class Message(Base):
     body: Mapped[str | None] = mapped_column(EncryptedText("messages.body"))
     attachment_key: Mapped[str | None] = mapped_column(String(32))
     attachment_type: Mapped[str | None] = mapped_column(String(10))
+    transcript: Mapped[str | None] = mapped_column(EncryptedText("messages.transcript"))
+    transcript_status: Mapped[str | None] = mapped_column(String(11))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, server_default=func.now()
     )
