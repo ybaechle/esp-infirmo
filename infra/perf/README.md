@@ -85,3 +85,25 @@ plus tard (hors périmètre INF-17, note pour un ticket futur) :
 - intégration des résultats k6 dans Prometheus/Grafana (`infra/monitoring/`,
   INF-15) via le output `k6 run --out experimental-prometheus-rw` pour
   visualiser les tendances de latence dans le temps.
+
+## Scénario API métier (`api.js`, YB-8)
+
+Mesure le KPI du cahier des charges (§10.5, p95 < 500 ms) sur les lectures courantes de l'API v1 : recherche
+classée, alertes, profil, missions et offres d'un cabinet. Le `setup` crée ses propres comptes fictifs
+(domaine `.example`), un cabinet et 20 offres ; rien d'existant n'est lu. La connexion est mesurée à part
+(`kind:login`) : le hachage scrypt est lent par conception et n'entre pas dans le seuil des lectures.
+
+```bash
+docker run --rm --network infirmo_default \
+  -e BASE_URL=http://backend:8000 -e VUS=5 -e DURATION=30s \
+  -v "$(pwd)/infra/perf:/scripts:ro" \
+  grafana/k6:1.5.0 run /scripts/api.js
+```
+
+L'inscription est limitée à 10 par minute et par IP : ne pas relancer le scénario en boucle.
+
+Relevé du 2026-10-10, backend et PostgreSQL/PostGIS locaux, un seul worker `uvicorn`, 5 utilisateurs virtuels
+pendant 30 s (environ 200 itérations de 6 lectures) : `p(95)` = 87 ms, 0 % d'échec, 100 % des contrôles.
+C'est un **contrôle de régression**, pas une étude de capacité : volume de données minuscule, aucune latence
+réseau, aucune charge concurrente sur la base. À rejouer sur staging avec un volume réaliste avant toute
+conclusion sur la tenue en charge.
