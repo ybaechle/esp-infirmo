@@ -11,6 +11,7 @@ from app.api.v1.offers import OfferPublic, member_offer
 from app.errors import ApiError
 from app.models import Application, Offer, User
 from app.pagination import Page, Pagination
+from app.services import notifications
 from app.services.missions import next_status
 from app.timeutil import as_utc, utcnow
 
@@ -39,6 +40,12 @@ def change_status(offer_id: uuid.UUID, body: StatusAction, user: Titulaire, db: 
         raise ApiError(409, "too_early", "The mission has not started yet")
     offer.status = target
     db.commit()
+    hired = db.scalars(
+        select(Application.user_id).where(
+            Application.offer_id == offer.id, Application.status == "accepted"
+        )
+    ).all()
+    notifications.notify(db, hired, "mission.status", offer_id=offer.id, status=target)
     return offer
 
 
@@ -58,6 +65,13 @@ def resign(application_id: uuid.UUID, user: Remplacant, db: DB):
     application.status, application.decided_at = "withdrawn", utcnow()
     offer.status = "open" if as_utc(offer.valid_till) > utcnow() else "cancelled"
     db.commit()
+    notifications.notify(
+        db,
+        notifications.office_titulaires(db, offer.office_id),
+        "mission.status",
+        offer_id=offer.id,
+        status=offer.status,
+    )
     return offer
 
 

@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import exists, func, or_, select, update
 from sqlalchemy.exc import IntegrityError
 
-from app import storage
+from app import realtime, storage
 from app.api.deps import DB, CurrentUser
 from app.errors import ApiError
 from app.models import Application, Conversation, Message, Offer, OfficeMember, User
@@ -183,6 +183,17 @@ def store_message(
         if attachment_key:
             storage.delete(attachment_key)
         raise
+    peer = (
+        conversation.user_b if conversation.user_a == user.id else conversation.user_a
+    )
+    realtime.publish(
+        [peer],
+        {
+            "type": "message.new",
+            "conversation_id": str(conversation.id),
+            "message_id": str(message.id),
+        },
+    )
     return message
 
 

@@ -124,3 +124,15 @@ def pg_client(pg_engine, pg_db, counts):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def published(request, monkeypatch):
+    """Capture les événements temps réel ; les tests `realtime` utilisent le vrai Redis."""
+    events = []
+    if request.node.get_closest_marker("realtime") is None:
+        monkeypatch.setattr(
+            "app.realtime.publish",
+            lambda user_ids, event: events.append((set(user_ids), event)),
+        )
+    return events

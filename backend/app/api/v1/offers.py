@@ -20,6 +20,7 @@ from app.api.v1.profile import CarePublic
 from app.errors import ApiError
 from app.models import Care, NursingOffice, Offer, User
 from app.pagination import Page, Pagination, paginate
+from app.services import notifications
 from app.timeutil import as_utc, utcnow
 
 router = APIRouter(tags=["offers"])
@@ -106,6 +107,12 @@ def publish_offer(office_id: uuid.UUID, body: OfferInput, user: Titulaire, db: D
     )
     db.add(offer)
     db.commit()
+    notifications.notify(
+        db,
+        notifications.matching_substitutes(db, offer),
+        "offer.match",
+        offer_id=offer.id,
+    )
     return offer
 
 

@@ -13,6 +13,7 @@ from app.api.v1.profile import CarePublic
 from app.errors import ApiError
 from app.models import Application, Offer, OfficeMember, Profile, User
 from app.pagination import Page, Pagination, paginate
+from app.services import notifications
 from app.timeutil import as_utc, utcnow
 
 router = APIRouter(tags=["applications"])
@@ -92,6 +93,13 @@ def apply(offer_id: uuid.UUID, body: ApplyInput, user: Remplacant, db: DB):
         raise ApiError(
             409, "already_applied", "Already applied to this offer"
         ) from None
+    notifications.notify(
+        db,
+        notifications.office_titulaires(db, offer.office_id),
+        "application.received",
+        offer_id=offer.id,
+        application_id=application.id,
+    )
     return application
 
 
@@ -137,10 +145,20 @@ def decide(
         raise ApiError(404, "application_not_found", "Application not found")
     if application.status != "pending":
         raise ApiError(409, "already_decided", "Application already decided")
+    rejected: list = []
     if body.decision == "accepted":
         if offer.status != "open":
             raise ApiError(409, "offer_closed", "Offer is no longer open")
         offer.status = "filled"
+        rejected = list(
+            db.scalars(
+                select(Application.user_id).where(
+                    Application.offer_id == offer_id,
+                    Application.id != application_id,
+                    Application.status == "pending",
+                )
+            )
+        )
         db.execute(
             update(Application)
             .where(
@@ -153,6 +171,13 @@ def decide(
     application.status = body.decision
     application.decided_at, application.decided_by = utcnow(), user.id
     db.commit()
+    for user_ids, outcome in (
+        ([application.user_id], body.decision),
+        (rejected, "rejected"),
+    ):
+        notifications.notify(
+            db, user_ids, "application.decided", offer_id=offer_id, decision=outcome
+        )
     return application
 
 

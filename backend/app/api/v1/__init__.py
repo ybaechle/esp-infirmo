@@ -10,10 +10,12 @@ from app.api.v1 import (
     messages,
     missions,
     offers,
+    notifications,
     offices,
     patients,
     profile,
     two_factor,
+    ws,
 )
 
 router = APIRouter(prefix="/api/v1")
@@ -28,5 +30,7 @@ router.include_router(applications.router)
 router.include_router(missions.router)
 router.include_router(messages.router)
 router.include_router(patients.router)
+router.include_router(notifications.router)
+router.include_router(ws.router)
 router.include_router(account.router)
 router.include_router(admin.router)

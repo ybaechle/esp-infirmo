@@ -3,6 +3,7 @@ from app.models.audit import AuditLog
 from app.models.availability import Availability
 from app.models.document import Document
 from app.models.message import Conversation, Message
+from app.models.notification import DeviceToken, Notification
 from app.models.office import NursingOffice, OfficeMember
 from app.models.offer import Offer, offer_cares
 from app.models.patient import Patient, Transmission
@@ -18,9 +19,11 @@ __all__ = [
     "Availability",
     "Care",
     "Conversation",
+    "DeviceToken",
     "Document",
     "Message",
     "NursingOffice",
+    "Notification",
     "OfficeMember",
     "Patient",
     "Offer",
