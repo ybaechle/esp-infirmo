@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1 import (
+    account,
     admin,
     applications,
     auth,
@@ -27,4 +28,5 @@ router.include_router(applications.router)
 router.include_router(missions.router)
 router.include_router(messages.router)
 router.include_router(patients.router)
+router.include_router(account.router)
 router.include_router(admin.router)
