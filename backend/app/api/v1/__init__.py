@@ -18,7 +18,23 @@ from app.api.v1 import (
     ws,
 )
 
-router = APIRouter(prefix="/api/v1")
+from app.errors import ErrorBody
+
+ERRORS = {
+    code: {"model": ErrorBody, "description": text}
+    for code, text in {
+        401: "Jeton absent, invalide ou expiré",
+        403: "Rôle ou statut de compte insuffisant",
+        404: "Ressource inconnue ou non accessible",
+        409: "Conflit avec l'état actuel de la ressource",
+        413: "Fichier trop volumineux",
+        422: "Requête invalide",
+        429: "Trop de tentatives",
+        503: "Dépendance indisponible (base, Redis, chiffrement, IA, fournisseur 2FA)",
+    }.items()
+}
+
+router = APIRouter(prefix="/api/v1", responses=ERRORS)
 router.include_router(auth.router)
 router.include_router(two_factor.router)
 router.include_router(profile.router)

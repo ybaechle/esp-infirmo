@@ -15,7 +15,37 @@ from app.crypto import EncryptionUnavailable
 from app.demo import router
 from app.errors import ApiError, api_error_handler
 
-app = FastAPI(title="infirmo-backend", version="0.1.0")
+DESCRIPTION = """API Infirmo : mise en relation d'infirmiers libéraux (remplacements, messagerie,
+transmissions). Authentification par jeton `Bearer` court + refresh à rotation.
+Les routes `/api/v1` renvoient leurs erreurs sous la forme `{"detail", "code"}`.
+Données synthétiques uniquement tant que l'hébergement HDS n'est pas validé."""
+
+TAGS = [
+    {"name": "auth", "description": "Inscription, connexion, refresh, 2FA"},
+    {"name": "profile", "description": "Profil professionnel et référentiel de soins"},
+    {"name": "offices", "description": "Cabinets et membres"},
+    {"name": "offers", "description": "Publication et consultation des offres"},
+    {
+        "name": "matching",
+        "description": "Recherche classée par pertinence, disponibilités",
+    },
+    {"name": "applications", "description": "Candidatures et décisions"},
+    {"name": "missions", "description": "Statuts de mission, désistement, calendrier"},
+    {"name": "messages", "description": "Conversations, photos, vocaux transcrits"},
+    {
+        "name": "patients",
+        "description": "Patients et transmissions chiffrées (30 jours)",
+    },
+    {"name": "documents", "description": "Documents légaux PDF"},
+    {"name": "notifications", "description": "Boîte d'alertes et appareils push"},
+    {"name": "realtime", "description": "WebSocket d'événements"},
+    {"name": "account", "description": "Export des données et droit à l'oubli"},
+    {"name": "admin", "description": "Comptes, documents, journal d'audit"},
+]
+
+app = FastAPI(
+    title="infirmo-backend", version="0.1.0", description=DESCRIPTION, openapi_tags=TAGS
+)
 app.include_router(router)
 app.include_router(api_v1)
 app.add_exception_handler(ApiError, api_error_handler)

@@ -2,6 +2,14 @@
 
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+
+
+class ErrorBody(BaseModel):
+    """Corps de toute erreur de l'API ; `code` est stable, `detail` est un texte indicatif."""
+
+    detail: str
+    code: str | None = None
 
 
 class ApiError(HTTPException):
