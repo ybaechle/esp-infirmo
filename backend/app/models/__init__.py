@@ -4,6 +4,7 @@ from app.models.document import Document
 from app.models.message import Conversation, Message
 from app.models.office import NursingOffice, OfficeMember
 from app.models.offer import Offer, offer_cares
+from app.models.patient import Patient, Transmission
 from app.models.profile import Care, Profile
 from app.models.session import AuthSession
 from app.models.two_factor import TwoFactorChallenge
@@ -19,8 +20,10 @@ __all__ = [
     "Message",
     "NursingOffice",
     "OfficeMember",
+    "Patient",
     "Offer",
     "Profile",
+    "Transmission",
     "TwoFactorChallenge",
     "User",
     "offer_cares",

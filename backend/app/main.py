@@ -36,6 +36,9 @@ async def encryption_unavailable(request, exc):
 
 @app.exception_handler(SQLAlchemyError)
 async def database_unavailable(request, exc):
+    # Une colonne chiffrée lève dans SQLAlchemy, qui enveloppe l'exception d'origine.
+    if isinstance(getattr(exc, "orig", None), EncryptionUnavailable):
+        return await encryption_unavailable(request, exc.orig)
     return JSONResponse(status_code=503, content={"detail": "Service unavailable"})
 
 
