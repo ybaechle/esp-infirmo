@@ -1,14 +1,65 @@
-# Backend — démonstration synthétique v0.1
+# Backend INFIRMO
 
-FastAPI, Python 3.12, SQLAlchemy, Alembic, PostgreSQL et Redis. Le parcours T9
-permet de se connecter, lire/modifier son profil puis se déconnecter. Les profils
-et sessions sont persistés dans PostgreSQL. SQLite est réservé aux tests unitaires.
+FastAPI, Python 3.12, SQLAlchemy, Alembic, PostgreSQL/PostGIS et Redis. Deux surfaces coexistent :
 
-**Démonstration locale uniquement, données fictives exclusivement.** Ce parcours
-n'est pas une authentification de production, une vérification d'identité/RPPS ou
-une preuve de conformité HDS/RGPD. Aucun patient, transmission ou audio accepté.
-La présence de `INFIRMO_DEMO_MODE=true` ouvre explicitement les routes `/api`;
-sans cette valeur exacte, elles répondent 404. Les health checks restent disponibles.
+- **API v1** (`/api/v1`) : inscription, profils, cabinets, offres, matching, candidatures, missions,
+  messagerie, transmissions patients, documents, notifications, WebSocket, audit, RGPD. Contrat :
+  [`docs/api/openapi.json`](../docs/api/openapi.json), guide : [`docs/api/integration-guide.md`](../docs/api/integration-guide.md),
+  décisions : [ADR 0005](../docs/adr/0005-backend-api-v1.md).
+- **Démonstration v0.1** (`/api/auth/login`, `/api/profile`, `/api/auth/logout`) : parcours synthétique
+  utilisé par le mobile et `infra/check_v01.py`, décrit plus bas. Elle n'est ouverte que si
+  `INFIRMO_DEMO_MODE=true`.
+
+**Données synthétiques uniquement** tant que l'hébergement HDS n'est pas validé (`AGENTS.md`).
+
+## Configuration de l'API v1
+
+| Variable | Rôle |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL **avec PostGIS** ; l'extension est créée par migration |
+| `REDIS_URL` | Limitation de débit et diffusion temps réel ; sans Redis les connexions sont refusées (503) |
+| `INFIRMO_ENCRYPTION_KEYS` | Trousseau AES-256 `id:base64,id:base64` (voir `.env.example`). Absent : les écritures chiffrées répondent 503 |
+| `INFIRMO_STORAGE_DIR` | Dossier des fichiers chiffrés (documents, photos, vocaux) ; un volume en Compose |
+| `INFIRMO_IA_URL` | Service de transcription (`POST /transcribe`). Absent : le vocal est gardé, transcription « indisponible » |
+
+Non branchés, par choix (`AGENTS.md` : revue de résidence des données avant tout fournisseur) : e-mail/SMS de la 2FA,
+push FCM/APNs, API publique de l'Ordre. Les routes concernées répondent explicitement 503 ou utilisent un mock.
+
+Générer une clé de chiffrement et la **sauvegarder séparément de la base** (clé perdue = données illisibles) :
+
+```sh
+python -c "import base64,os;print('k1:'+base64.b64encode(os.urandom(32)).decode())"
+```
+
+## Organisation
+
+```text
+app/main.py        application, gestionnaires d'erreurs, /health, /metrics, démo
+app/api/v1/        routes par domaine (auth, offices, offers, matching, applications, missions,
+                   messages, patients, documents, notifications, ws, account, admin)
+app/services/      règles métier : sessions, OTP, matching, missions, notifications, audit, purge, IA
+app/models/        modèles SQLAlchemy ; migrations/versions/ pour le schéma
+app/crypto.py      AES-256-GCM et colonne chiffrée ; app/storage.py : fichiers chiffrés
+```
+
+## Commandes d'exploitation
+
+```sh
+uv run python -m alembic upgrade head          # schéma (le serveur ne le crée jamais)
+uv run python -m app.promote_admin <email>     # désigne un administrateur (compte existant)
+uv run python -m app.purge                     # rétention : transmissions 30 j, sessions, défis 2FA, audit > 1 an
+uv run python -m app.export_openapi            # régénère docs/api/openapi.json
+```
+
+`app.purge` doit être **planifiée** (cron ou tâche Compose, quotidienne) : aucune requête ne la déclenche.
+Sans elle, les transmissions expirées restent invisibles à la lecture mais subsistent en base.
+
+## Démonstration v0.1
+
+**Démonstration locale uniquement, données fictives exclusivement.** Ce parcours n'est pas une authentification
+de production, une vérification d'identité/RPPS ni une preuve de conformité HDS/RGPD : l'API v1 la remplace.
+La présence de `INFIRMO_DEMO_MODE=true` ouvre explicitement ses routes `/api` ; sans cette valeur exacte,
+elles répondent 404. Les health checks restent disponibles.
 
 ## Lancer
 
@@ -39,7 +90,7 @@ Il refuse toute adresse ne finissant pas par le domaine réservé `.example`.
 | `INFIRMO_DEMO_EMAIL` | Amorçage uniquement; défaut `demo@infirmo.example` |
 | `INFIRMO_DEMO_PASSWORD` | Amorçage uniquement; défaut public `Infirmo-demo-2026!`, minimum 12 caractères |
 
-## Contrat API
+## Contrat de la démonstration
 
 | Route | Corps / résultat |
 | --- | --- |
@@ -104,3 +155,24 @@ suite SQLite verte ne prouve pas l'intégration PostgreSQL. Le script
 [`infra/check_v01.py`](../infra/check_v01.py) vérifie aussi l'API HTTP de Compose.
 
 Versionnement indépendant : `backend-vX.Y.Z`.
+
+## Tests de l'API v1
+
+```sh
+export TEST_DATABASE_URL=postgresql://infirmo:local-demo-only@127.0.0.1:5432/infirmo_test
+export REDIS_URL=redis://127.0.0.1:6379/0
+uv run pytest -q                                   # SQLite en mémoire + tests PostgreSQL/Redis
+INFIRMO_TEST_DATABASE=postgres uv run pytest -q    # toute la suite sur PostgreSQL/PostGIS
+```
+
+Sans `TEST_DATABASE_URL`, les tests qui exigent PostgreSQL (recherche géographique, parcours complet,
+triggers d'audit, concurrence) sont **ignorés** et le rapport le dit : une suite SQLite verte ne les remplace pas.
+Les tests WebSocket exigent `REDIS_URL`. La CI exécute les deux modes. Le contrat `openapi.json` est
+comparé au code : après un changement de route, lancer `uv run python -m app.export_openapi`.
+
+## Limites connues
+
+- Chiffrement **au repos** côté serveur ; le chiffrement de bout en bout du cahier des charges (F4.1) n'est pas livré.
+- Matching : classement sur les 300 offres les plus proches, pondérations fixes à calibrer.
+- Un compte est actif dès l'inscription (numéro d'Ordre simulé, pas de vérification de l'e-mail faute de fournisseur).
+- Le contrat du service IA (`POST /transcribe`) est une hypothèse à confirmer avec son responsable.
