@@ -36,6 +36,8 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run pytest -q --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70 --junitxml=test-results.xml
+      # Même suite sur PostgreSQL/PostGIS : contraintes, clés étrangères et fuseaux réels.
+      - run: INFIRMO_TEST_DATABASE=postgres uv run pytest -q --no-cov
       - uses: actions/upload-artifact@v4
         if: always()
         with:
