@@ -54,6 +54,13 @@ services:
       INFIRMO_DEMO_MODE: "true"
       INFIRMO_DEMO_EMAIL: ${INFIRMO_DEMO_EMAIL:-demo@infirmo.example}
       INFIRMO_DEMO_PASSWORD: ${INFIRMO_DEMO_PASSWORD:-Infirmo-demo-2026!}
+      # Vide par défaut : l'API /api/v1 refuse alors de stocker des données chiffrées
+      # (503 encryption_unavailable) au lieu de les écrire en clair. Voir backend/README.md.
+      INFIRMO_ENCRYPTION_KEYS: ${INFIRMO_ENCRYPTION_KEYS:-}
+      INFIRMO_STORAGE_DIR: /data/storage
+      INFIRMO_IA_URL: http://ia:8001
+    volumes:
+      - backend_storage:/data/storage
     command: ["sh", "-c", "alembic upgrade head && python -m app.seed_demo && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log"]
     ports:
       # Publié sur BACKEND_PORT (défaut 8000) : modifiable dans .env si le
@@ -162,6 +169,7 @@ services:
 
 volumes:
   pgdata:
+  backend_storage:
   prometheus_data:
   grafana_data:
 

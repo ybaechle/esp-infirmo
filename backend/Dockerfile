@@ -22,9 +22,10 @@ COPY app ./app
 COPY alembic.ini ./
 COPY migrations ./migrations
 
-# Utilisateur non-root.
+# Utilisateur non-root ; /data/storage reçoit les fichiers chiffrés (volume en Compose).
 RUN useradd --create-home --uid 1000 appuser \
-    && chown -R appuser:appuser /app
+    && mkdir -p /data/storage \
+    && chown -R appuser:appuser /app /data/storage
 USER appuser
 
 EXPOSE 8000

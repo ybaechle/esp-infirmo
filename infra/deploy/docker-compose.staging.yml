@@ -56,6 +56,11 @@ services:
       INFIRMO_DEMO_MODE: ${INFIRMO_DEMO_MODE:-false}
       INFIRMO_DEMO_EMAIL: ${INFIRMO_DEMO_EMAIL:-demo@infirmo.example}
       INFIRMO_DEMO_PASSWORD: ${INFIRMO_DEMO_PASSWORD:-}
+      INFIRMO_ENCRYPTION_KEYS: ${INFIRMO_ENCRYPTION_KEYS:-}
+      INFIRMO_STORAGE_DIR: /data/storage
+      INFIRMO_IA_URL: http://ia:8001
+    volumes:
+      - backend_storage:/data/storage
     command: ["sh", "-c", "alembic upgrade head && if [ \"$$INFIRMO_DEMO_MODE\" = true ]; then python -m app.seed_demo; fi && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log"]
     # Pas de "ports:" : backend n'est joignable que via Caddy, sur le réseau
     # "default" — jamais publié directement sur l'hôte.
@@ -121,6 +126,7 @@ services:
 
 volumes:
   pgdata:
+  backend_storage:
   caddy_data:
   caddy_config:
 
