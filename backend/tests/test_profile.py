@@ -1,8 +1,9 @@
 import pytest
 from sqlalchemy import select
 
-from app.models import Care, Profile, User
+from app.models import Profile, User
 
+from tests.helpers import seed_cares
 from tests.test_register import PASSWORD, payload
 
 EMAIL = "camille.demo@infirmo.example"
@@ -21,13 +22,7 @@ FULL = {
 
 @pytest.fixture
 def auth(client, db):
-    db.add_all(
-        [
-            Care(code="injections", label="Injections"),
-            Care(code="pansements", label="Pansements"),
-        ]
-    )
-    db.commit()
+    seed_cares(db, "injections", "pansements")
     client.post("/api/v1/auth/register", json=payload())
     tokens = client.post(
         "/api/v1/auth/login", json={"email": EMAIL, "password": PASSWORD}
@@ -119,7 +114,9 @@ def test_profiles_are_isolated_between_accounts(client, auth):
     assert body["city"] is None and body["cares"] == []
 
 
-def test_cares_reference_is_listed_sorted(client, auth):
-    codes = [c["code"] for c in client.get("/api/v1/cares", headers=auth).json()]
+def test_cares_reference_is_listed_sorted_by_label(client, auth):
+    cares = client.get("/api/v1/cares", headers=auth).json()
 
-    assert codes == ["injections", "pansements"]
+    labels = [c["label"] for c in cares]
+    assert labels == sorted(labels)
+    assert {"injections", "pansements"} <= {c["code"] for c in cares}

@@ -5,9 +5,16 @@ import pytest
 from sqlalchemy import select, update
 
 from app.geo import haversine_km
-from app.models import Care, DeviceToken, Notification, User
+from app.models import DeviceToken, Notification, User
 from app.services import notifications
-from tests.helpers import ORDERS, make_office, offer_payload, sign_up, user_id
+from tests.helpers import (
+    seed_cares,
+    ORDERS,
+    make_office,
+    offer_payload,
+    sign_up,
+    user_id,
+)
 
 NANCY = (48.6921, 6.1844)
 STRASBOURG = (48.5734, 7.7521)
@@ -15,13 +22,7 @@ STRASBOURG = (48.5734, 7.7521)
 
 @pytest.fixture(autouse=True)
 def cares(db):
-    db.add_all(
-        [
-            Care(code="injections", label="Injections"),
-            Care(code="pansements", label="Pansements"),
-        ]
-    )
-    db.commit()
+    seed_cares(db, "injections", "pansements")
 
 
 def profile(client, headers, location=NANCY, **extra):

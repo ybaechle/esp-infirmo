@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -10,13 +12,29 @@ from app.ratelimit import get_counter
 
 
 @pytest.fixture
-def db_engine():
+def db_engine(request):
+    """SQLite en mémoire par défaut ; `INFIRMO_TEST_DATABASE=postgres` rejoue tout sur PostgreSQL."""
+    if os.environ.get("INFIRMO_TEST_DATABASE") == "postgres":
+        engine = request.getfixturevalue("pg_engine")
+        truncate(engine)
+        yield engine
+        return
     engine = create_engine(
         "sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool
     )
     Base.metadata.create_all(engine)
     yield engine
     engine.dispose()
+
+
+def truncate(engine):
+    from sqlalchemy import text
+
+    tables = [t.name for t in Base.metadata.sorted_tables if t.name != "cares"]
+    with engine.begin() as connection:
+        connection.execute(
+            text("TRUNCATE " + ", ".join(f'"{name}"' for name in tables) + " CASCADE")
+        )
 
 
 @pytest.fixture
@@ -98,13 +116,7 @@ def pg_engine():
 
 @pytest.fixture
 def pg_db(pg_engine):
-    from sqlalchemy import text
-
-    tables = [t.name for t in Base.metadata.sorted_tables if t.name != "cares"]
-    with pg_engine.begin() as connection:
-        connection.execute(
-            text("TRUNCATE " + ", ".join(f'"{name}"' for name in tables) + " CASCADE")
-        )
+    truncate(pg_engine)
     with Session(pg_engine) as session:
         yield session
 

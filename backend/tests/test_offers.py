@@ -4,8 +4,8 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from sqlalchemy import update
 
-from app.models import Care, Offer
-from tests.helpers import ORDERS, make_office, offer_payload, sign_up
+from app.models import Offer
+from tests.helpers import seed_cares, ORDERS, make_office, offer_payload, sign_up
 
 
 @pytest.fixture
@@ -25,13 +25,7 @@ def substitute(client):
 
 @pytest.fixture(autouse=True)
 def cares(db):
-    db.add_all(
-        [
-            Care(code="injections", label="Injections"),
-            Care(code="pansements", label="Pansements"),
-        ]
-    )
-    db.commit()
+    seed_cares(db, "injections", "pansements")
 
 
 def publish(client, headers, office, **overrides):

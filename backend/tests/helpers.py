@@ -69,3 +69,14 @@ def luhn_check_digit(prefix: str) -> str:
 def siret(n: int) -> str:
     prefix = f"{n:013d}"
     return prefix + luhn_check_digit(prefix)
+
+
+def seed_cares(db, *codes):
+    """Ajoute les soins manquants : PostgreSQL les reçoit déjà de la migration, SQLite non."""
+    from sqlalchemy import select
+
+    from app.models import Care
+
+    known = set(db.scalars(select(Care.code)))
+    db.add_all(Care(code=c, label=c.capitalize()) for c in codes if c not in known)
+    db.commit()

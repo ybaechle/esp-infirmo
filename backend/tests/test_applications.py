@@ -5,14 +5,20 @@ from datetime import UTC, datetime, timedelta
 import pytest
 from sqlalchemy import update
 
-from app.models import Care, Offer
-from tests.helpers import ORDERS, make_office, offer_payload, sign_up, user_id
+from app.models import Offer
+from tests.helpers import (
+    seed_cares,
+    ORDERS,
+    make_office,
+    offer_payload,
+    sign_up,
+    user_id,
+)
 
 
 @pytest.fixture(autouse=True)
 def cares(db):
-    db.add(Care(code="injections", label="Injections"))
-    db.commit()
+    seed_cares(db, "injections")
 
 
 @pytest.fixture
