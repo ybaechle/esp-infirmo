@@ -13,7 +13,7 @@ from app.errors import ApiError
 from app.models import User
 from app.passwords import DUMMY_HASH, hash_password, verify_password
 from app.ratelimit import Limiter
-from app.services import otp, sessions
+from app.services import audit, otp, sessions
 from app.services.ordre import OrdreUnavailable, OrdreVerifier, get_ordre_verifier
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -143,8 +143,17 @@ def login(
     user = db.scalar(select(User).where(User.email == body.email))
     valid = verify_password(body.password, user.password_hash if user else DUMMY_HASH)
     if not valid or user is None:
+        audit.record_now(
+            db,
+            user.id if user else None,
+            "auth.login",
+            "user",
+            user.id if user else None,
+            "failure",
+        )
         raise ApiError(401, "invalid_credentials", "Invalid credentials")
     if user.status != "active":
+        audit.record_now(db, user.id, "auth.login", "user", user.id, "denied")
         raise ApiError(403, "account_inactive", "Account inactive")
     if user.two_factor_channel:
         challenge_id = otp.start_challenge(
@@ -157,6 +166,7 @@ def login(
 def _open_session(db, user):
     sessions.purge_expired(db)
     pair = sessions.issue(db, user.id)
+    audit.record(db, user.id, "auth.login", "user", user.id)
     db.commit()
     return asdict(pair)
 

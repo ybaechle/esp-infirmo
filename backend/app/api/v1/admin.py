@@ -1,16 +1,18 @@
 import uuid
+from datetime import datetime
 from typing import Literal
 
 from fastapi import APIRouter
-from pydantic import BaseModel, ConfigDict
+from pydantic import AwareDatetime, BaseModel, ConfigDict
 from sqlalchemy import select
 
 from app.api.deps import DB, AdminUser
 from app.api.v1.auth import UserPublic
 from app.errors import ApiError
 from app.api.v1.documents import DocumentPublic
-from app.models import Document, User
+from app.models import AuditLog, Document, User
 from app.pagination import Page, Pagination, paginate
+from app.services import audit
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -36,6 +38,7 @@ def update_user_status(
     if user is None or user.status == "deleted":
         raise ApiError(404, "user_not_found", "User not found")
     user.status = body.status
+    audit.record(db, admin.id, "admin.user_status", "user", user.id)
     db.commit()
     return user
 
@@ -65,5 +68,40 @@ def review_document(
     if document is None:
         raise ApiError(404, "document_not_found", "Document not found")
     document.status, document.reviewed_by = body.status, admin.id
+    audit.record(db, admin.id, "admin.document_review", "document", document.id)
     db.commit()
     return document
+
+
+class AuditPublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    at: datetime
+    actor_id: uuid.UUID | None
+    action: str
+    resource_type: str | None
+    resource_id: uuid.UUID | None
+    outcome: str
+
+
+@router.get("/audit-logs", response_model=Page[AuditPublic])
+def audit_logs(
+    admin: AdminUser,
+    db: DB,
+    page: Pagination,
+    actor_id: uuid.UUID | None = None,
+    action: str | None = None,
+    since: AwareDatetime | None = None,
+    until: AwareDatetime | None = None,
+):
+    statement = select(AuditLog)
+    if actor_id:
+        statement = statement.where(AuditLog.actor_id == actor_id)
+    if action:
+        statement = statement.where(AuditLog.action == action)
+    if since:
+        statement = statement.where(AuditLog.at >= since)
+    if until:
+        statement = statement.where(AuditLog.at < until)
+    return paginate(db, statement.order_by(AuditLog.at.desc(), AuditLog.id), page)

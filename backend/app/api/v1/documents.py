@@ -10,6 +10,7 @@ from app import storage
 from app.api.deps import DB, CurrentUser
 from app.errors import ApiError
 from app.models import Document
+from app.services import audit
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -63,6 +64,8 @@ def upload_document(
     document.status, document.reviewed_by = "pending", None
     db.add(document)
     try:
+        db.flush()
+        audit.record(db, user.id, "document.upload", "document", document.id)
         db.commit()
     except Exception:
         storage.delete(key)
@@ -89,6 +92,7 @@ def owned_or_admin(db, document_id: uuid.UUID, user) -> Document:
 @router.get("/{document_id}/file")
 def download_document(document_id: uuid.UUID, user: CurrentUser, db: DB):
     document = owned_or_admin(db, document_id, user)
+    audit.record_now(db, user.id, "document.download", "document", document.id)
     return Response(
         storage.get(document.storage_key, CONTEXT),
         media_type="application/pdf",
@@ -107,5 +111,6 @@ def delete_document(document_id: uuid.UUID, user: CurrentUser, db: DB):
         raise ApiError(404, "document_not_found", "Document not found")
     key = document.storage_key
     db.delete(document)
+    audit.record(db, user.id, "document.delete", "document", document_id)
     db.commit()
     storage.delete(key)

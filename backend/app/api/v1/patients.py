@@ -11,6 +11,7 @@ from app.api.v1.offices import membership
 from app.errors import ApiError
 from app.models import Application, NursingOffice, Offer, Patient, Transmission, User
 from app.pagination import Page, Pagination, paginate
+from app.services import audit
 from app.timeutil import utcnow
 
 router = APIRouter(tags=["patients"])
@@ -102,6 +103,7 @@ def accessible_patient(db, patient_id: uuid.UUID, user: User) -> Patient:
         )
     )
     if not allowed or patient.anonymized_at is not None:
+        audit.record_now(db, user.id, "patient.access", "patient", patient_id, "denied")
         raise ApiError(404, "patient_not_found", "Patient not found")
     return patient
 
@@ -124,6 +126,8 @@ def create_patient(office_id: uuid.UUID, body: PatientInput, user: Titulaire, db
         consent_at=utcnow(),
     )
     db.add(patient)
+    db.flush()
+    audit.record(db, user.id, "patient.create", "patient", patient.id)
     db.commit()
     return patient_view(patient)
 
@@ -150,6 +154,7 @@ def forget_patient(patient_id: uuid.UUID, user: Titulaire, db: DB):
     db.execute(delete(Transmission).where(Transmission.patient_id == patient.id))
     patient.first_name = patient.last_name = patient.birth_date = None
     patient.anonymized_at = utcnow()
+    audit.record(db, user.id, "patient.forget", "patient", patient.id)
     db.commit()
 
 
@@ -170,6 +175,8 @@ def add_transmission(
         expires_at=now + RETENTION,
     )
     db.add(transmission)
+    db.flush()
+    audit.record(db, user.id, "transmission.create", "transmission", transmission.id)
     db.commit()
     return transmission
 
@@ -181,6 +188,7 @@ def list_transmissions(
     patient_id: uuid.UUID, user: CurrentUser, db: DB, page: Pagination
 ):
     patient = accessible_patient(db, patient_id, user)
+    audit.record_now(db, user.id, "transmission.read", "patient", patient.id)
     return paginate(
         db,
         select(Transmission)

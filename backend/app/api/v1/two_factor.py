@@ -10,7 +10,7 @@ from app.errors import ApiError
 from app.models import User
 from app.passwords import verify_password
 from app.ratelimit import Limiter
-from app.services import otp
+from app.services import audit, otp
 
 router = APIRouter(prefix="/auth/2fa", tags=["auth"])
 Sender = Annotated[otp.OtpSender, Depends(otp.get_otp_sender)]
@@ -53,6 +53,7 @@ def enable(body: EnableInput, user: CurrentUser, db: DB, sender: Sender):
 def confirm(body: CodeInput, user: CurrentUser, db: DB):
     challenge = otp.check_challenge(db, body.challenge_id, body.code, "enable", user.id)
     user.two_factor_channel = challenge.channel
+    audit.record(db, user.id, "auth.2fa_enabled", "user", user.id)
     db.commit()
 
 
@@ -61,6 +62,7 @@ def disable(body: DisableInput, user: CurrentUser, db: DB):
     if not verify_password(body.password, user.password_hash):
         raise ApiError(401, "invalid_credentials", "Invalid credentials")
     user.two_factor_channel = None
+    audit.record(db, user.id, "auth.2fa_disabled", "user", user.id)
     db.commit()
 
 
