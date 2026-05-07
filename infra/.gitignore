@@ -1,0 +1,39 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Docker / Compose
+docker-compose.override.yml
+docker-compose.override.yaml
+.env
+.env.*
+!.env.example
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+kube.config
+secrets/
+!secrets/.gitkeep
+
+# Helm
+charts/*/charts/
+charts/*/Chart.lock
+*.tgz
+
+# Cloud CLIs / credentials
+.aws/
+.gcp/
+gcp-key*.json
+service-account*.json
