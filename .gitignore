@@ -1,0 +1,21 @@
+# macOS
+.DS_Store
+
+# Environment files
+.env
+.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node / Flutter
+node_modules/
+.dart_tool/
+build/
+
+# IDE
+.vscode/
+.idea/
