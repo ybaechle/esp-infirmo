@@ -1,41 +1,218 @@
-# Infirmo
+# INFIRMO — T-ESP-800
 
-Infirmo is a medical / nursing-domain application split across a backend service, a mobile app, an AI/ML workbench, and shared infrastructure code. This repository is the team's monorepo: every package lives here, but each is versioned and released independently.
+**Le réseau professionnel des infirmiers libéraux**
 
-## Monorepo layout
+INFIRMO est un projet réalisé dans le cadre du module **T-ESP-800 — Epitech Nancy, MSC 2027**.
 
-| Path        | Stack                                  | Purpose                                                  | Owner(s)                |
-| ----------- | -------------------------------------- | -------------------------------------------------------- | ----------------------- |
-| `backend/`  | Python (FastAPI — TBC in INF-2)        | HTTP/API service, business logic, persistence            | TBD                     |
-| `mobile/`   | Flutter / Dart                         | Cross-platform mobile client (iOS + Android)             | TBD                     |
-| `ia/`       | Python + Jupyter notebooks             | ML/LLM experiments, training, model serving              | TBD                     |
-| `infra/`    | Terraform + Docker/Compose + Kubernetes| Deployment, environments, container images, IaC          | Lazaro Marrero Rousse                     |
+Le projet vise à concevoir une application mobile sécurisée destinée aux infirmiers libéraux titulaires et aux infirmiers remplaçants. L’objectif est de faciliter la mise en relation professionnelle, la recherche de remplacements, la gestion des candidatures, les transmissions sécurisées et l’utilisation d’une assistance IA pour la transcription vocale.
 
-Owners will be filled in by each package's own README as the team formalises responsibilities (see [`backend/README.md`](backend/README.md), [`mobile/README.md`](mobile/README.md), [`ia/README.md`](ia/README.md), [`infra/README.md`](infra/README.md)).
+---
 
-## Versioning
+## 1. Présentation du projet
 
-Each package is versioned independently. Tag prefixes:
+Les infirmiers libéraux doivent assurer la continuité des soins, notamment en cas d’absence, de congé, de maladie ou de surcharge d’activité. Aujourd’hui, la recherche de remplaçants repose souvent sur des outils généralistes ou informels, peu adaptés aux contraintes du secteur médical.
 
-- `backend-vX.Y.Z`
-- `mobile-vX.Y.Z`
-- `ia-vX.Y.Z`
+INFIRMO propose une plateforme mobile spécialisée permettant :
 
-There is no repository-wide version. `infra/` is versioned alongside the package(s) it deploys.
+- la création de profils professionnels infirmiers et cabinets ;
+- la recherche de remplacements selon la zone, les disponibilités et les critères métier ;
+- la publication d’offres de remplacement ;
+- la gestion des candidatures et des statuts de mission ;
+- la communication sécurisée entre professionnels ;
+- la transcription vocale assistée par IA ;
+- la prise en compte des contraintes RGPD, sécurité et hébergement HDS.
 
-## Getting started
+---
 
-This README is intentionally light on setup steps. Each package has its own README with the toolchain it expects and how to run it locally:
+## 2. Dépôt GitHub
 
-- Backend → [`backend/README.md`](backend/README.md)
-- Mobile → [`mobile/README.md`](mobile/README.md)
-- IA → [`ia/README.md`](ia/README.md)
-- Infra → [`infra/README.md`](infra/README.md)
+Ce dépôt est le dépôt principal du projet :
 
-## Contributing
+```text
+T-ESP-800-project-100856-NCY_Infirmo
+```
 
-Contribution conventions (branch naming, commit-message style for cross-package vs. scoped changes, PR review rules) live in `CONTRIBUTING.md` — _coming in INF-3_. Until that lands, please coordinate with Lazaro or Tetiana before opening PRs that touch multiple packages.
+Il sert de mono-repo pour centraliser :
 
-## License
+- la documentation projet ;
+- les livrables ;
+- le code applicatif ;
+- la configuration DevOps ;
+- le suivi technique du projet.
 
-This repository is private. See [`LICENSE`](LICENSE) — currently a proprietary "All rights reserved" placeholder pending the team's final license decision.
+La structure complète sera mise en place progressivement au fur et à mesure du développement.
+
+Structure cible :
+
+```text
+.
+├── README.md
+├── CONTRIBUTING.md
+├── docs/
+│   └── livrables/
+│       └── maquettes/
+├── mobile/
+├── backend/
+├── ia/
+└── infra/
+```
+
+Les dossiers `mobile/`, `backend/`, `ia/` et `infra/` correspondent aux principaux modules techniques du projet. Ils pourront contenir leur propre documentation lorsque leur développement démarrera.
+
+---
+
+## 3. Modules du projet
+
+| Module | Rôle |
+| ------ | ---- |
+| `mobile/` | Application mobile Flutter destinée aux infirmiers titulaires et remplaçants. |
+| `backend/` | API backend, authentification, profils, remplacements, matching, messagerie et logique métier. |
+| `ia/` | Service IA pour la transcription vocale et l’extraction d’informations. |
+| `infra/` | Docker, CI/CD, déploiement, monitoring et configuration DevOps. |
+| `docs/` | Cahier des charges, livrables, maquettes et documentation projet. |
+
+---
+
+## 4. Livrables
+
+Les livrables principaux du projet sont centralisés dans le dossier `docs/livrables/`.
+
+| Livrable | Emplacement / support | Échéance |
+| -------- | --------------------- | -------- |
+| Cahier des charges | `docs/livrables/` | Juin 2026 |
+| Maquettes UI/UX MVP | `docs/livrables/maquettes/` + lien Figma | Juin 2026 |
+| Backlog GitHub Projects | GitHub Projects | Juin 2026 puis suivi continu |
+| README principal | `README.md` | Juin 2026 |
+| Conventions projet | `CONTRIBUTING.md` | Juin 2026 |
+| Documentation technique | README par module + `docs/` | Mars 2027 |
+| Application mobile MVP | `mobile/` | Avril 2027 |
+| Backend API | `backend/` | Avril 2027 |
+| Service IA | `ia/` | Avril 2027 |
+| Infrastructure / DevOps | `infra/` | Avril 2027 |
+| Support de soutenance | Slides + démonstration | Avril 2027 |
+
+---
+
+## 5. Maquettes UI/UX
+
+Les maquettes UI/UX du MVP sont réalisées dans Figma. Elles sont accessibles via un lien partagé depuis le dépôt GitHub du projet, dans le dossier :
+
+```text
+docs/livrables/maquettes/
+```
+
+Le fichier Figma constitue la référence visuelle pour la conception de l’application mobile et sert de support aux échanges de conception, à la validation des parcours utilisateurs et à l’implémentation progressive des écrans Flutter.
+
+---
+
+## 6. Organisation du projet
+
+Le projet est suivi avec **GitHub Projects**.
+
+Les tickets du backlog reprennent le backlog consolidé du cahier des charges. Chaque ticket est rattaché à un responsable, une estimation en jours-hommes, une priorité, un epic, un code WBS et, lorsque cela s’applique, une fonctionnalité ou user story du cahier des charges.
+
+Workflow utilisé :
+
+```text
+To Do → In Progress → In Review → Done
+```
+
+---
+
+## 7. Milestones et sprints
+
+Le projet est suivi à deux niveaux complémentaires.
+
+Les **milestones M1 à M6** correspondent aux grands jalons fonctionnels et documentaires du projet. Ils structurent la roadmap macro.
+
+Les **sprints** correspondent aux cycles opérationnels de travail dans GitHub Projects. Le champ `Sprint` permet d’indiquer dans quel cycle un ticket est traité.
+
+| Niveau | Usage |
+| ------ | ----- |
+| Milestone | Suivi macro du projet et des livrables : M1 à M6. |
+| Sprint | Suivi opérationnel des tickets par cycle de travail effectif. |
+| Start date / Target date | Dates utilisées pour l’affichage Roadmap dans GitHub Projects. |
+
+Un ticket peut donc appartenir à un milestone fonctionnel tout en étant traité dans un sprint précis.
+
+---
+
+## 8. Planning macro
+
+| Milestone | Période | Objectif principal | Livrable clé |
+| --------- | ------- | ----------------- | ------------ |
+| M1 - Spécifications | Fév. - Juin 2026 | Cahier des charges, maquettes Figma, backlog, architecture, préparation du dépôt | Docs + maquettes + backlog |
+| M2 - MVP Core | Sept. - Nov. 2026 | Authentification, profils, documents, matching, socle mobile/backend | MVP fonctionnel |
+| M3 - Remplacements | Déc. 2026 | Publication de tournées, candidatures, calendrier, statuts de mission | Module remplacements |
+| M4 - Communication | Oct. 2026 - Jan. 2027 | Messagerie sécurisée, transmissions, vocaux, transcription IA, notifications | Module communication |
+| M5 - Mobile & IA | Fév. - Mars 2027 | Tests, intégration, optimisation mobile/backend/IA, stabilisation | App mobile + IA stabilisées |
+| M6 - Sécurité & Deploy | Mars 2027 | Sécurité, RGPD, HDS, déploiement candidat, documentation finale | Version candidate avant réserve |
+| Réserve | Avril 2027 | Corrections, stabilisation, ajustements finaux et soutenance | Démo finale + soutenance |
+
+---
+
+## 9. Sprints de travail
+
+| Sprint | Période | Objectif opérationnel |
+| ------ | ------- | -------------------- |
+| Sprint 1 | 11/09/2026 - 24/09/2026 | Lancement technique : structure du dépôt, conventions, setup mobile/backend/IA, Docker, CI initiale. |
+| Sprint 2 | 25/09/2026 - 27/11/2026 | Développement MVP Core : authentification, profils, documents, matching, premières intégrations. |
+| Sprint 3 | 30/11/2026 - 22/01/2027 | Remplacements et communication : candidatures, calendrier, messagerie, transmissions, IA. |
+| Sprint 4 | 29/01/2027 - 05/03/2027 | Tests, intégration, sécurité, optimisation et stabilisation de l’application. |
+| Sprint 5 | 12/03/2027 - 19/03/2027 | Clôture opérationnelle : documentation technique, passation, livraison candidate. |
+
+Avril 2027 est conservé comme réserve de finalisation. Cette période permet d’absorber les retards éventuels, de corriger les anomalies, de stabiliser la démonstration et de préparer la soutenance.
+
+---
+
+## 10. Équipe
+
+| Membre | Rôle |
+| ------ | ---- |
+| Tetiana Lombardi | Cheffe de projet / UI-UX |
+| Maxence Noizet | Dev Mobile Flutter |
+| Yohan Baechlé | Dev Fullstack |
+| Louis Chenot | Dev Backend |
+| Ziad Tiarimti | Dev Backend |
+| Pierre-Arthur Toutouom Yountebo | Dev IA |
+| Lazaro Marrero Rousse | DevOps |
+
+---
+
+## 11. Stack technique prévue
+
+| Couche | Technologie |
+| ------ | ----------- |
+| Mobile | Flutter |
+| Backend | FastAPI |
+| Base de données | PostgreSQL + PostGIS |
+| Temps réel | WebSocket + Redis pub/sub |
+| IA | Whisper |
+| Conteneurisation | Docker |
+| CI/CD | GitHub Actions |
+| Maquettes | Figma |
+
+---
+
+## 12. Contribution
+
+Les règles de contribution sont décrites dans [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+Ce document précise notamment :
+
+- les conventions Git ;
+- le workflow des Pull Requests ;
+- la gestion des tickets GitHub Projects ;
+- les champs utilisés dans le backlog ;
+- les règles de sécurité ;
+- les conventions de code ;
+- la Definition of Done.
+
+---
+
+## 13. Références projet
+
+- Cahier des charges INFIRMO v4
+- GitHub Projects du projet
+- Maquettes Figma du MVP
+- `CONTRIBUTING.md`
