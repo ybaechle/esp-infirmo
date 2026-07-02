@@ -85,12 +85,72 @@ services:
       retries: 5
       start_period: 10s
 
+  # --- Profil "monitoring" (INF-15) --------------------------------------
+  # Désactivé par défaut : démarrer avec
+  #   docker compose --profile monitoring up -d
+  # Scrape uniquement /metrics du backend (compteurs/latences par route,
+  # jamais de contenu de requête — AGENTS.md §5.6). Voir
+  # infra/monitoring/README.md.
+
+  prometheus:
+    image: prom/prometheus:v3.9.1
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    volumes:
+      - ./infra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana:12.3.0
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      # Pas de valeur par défaut : docker compose refuse de démarrer tant que
+      # GRAFANA_ADMIN_PASSWORD n'est pas défini dans .env.
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD doit etre defini dans .env (cf .env.example)}
+      # Accès anonyme désactivé explicitement (défaut Grafana, réaffirmé ici
+      # par exigence de durcissement — AGENTS.md §5).
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 volumes:
   pgdata:
+  prometheus_data:
+  grafana_data:
 
 networks:
   # Réseau par défaut : db, redis et backend (créé implicitement, déclaré
-  # ici pour documenter explicitement qui y participe).
+  # ici pour documenter explicitement qui y participe). prometheus/grafana
+  # (profil "monitoring") y sont aussi : ils doivent joindre backend:8000.
   default:
   # Réseau interne uniquement backend <-> ia, sans route vers l'extérieur.
   internal:

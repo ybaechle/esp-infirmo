@@ -47,3 +47,14 @@ def test_health_ready_returns_503_when_env_vars_missing(monkeypatch) -> None:
     body = response.json()
     assert body["postgres"] is False
     assert body["redis"] is False
+
+
+def test_metrics_exposes_prometheus_http_metrics() -> None:
+    """INF-15 : /metrics doit exposer les métriques standard (comptages,
+    latence) sans jamais contenir de donnée de santé (AGENTS.md §5.6)."""
+    client.get("/health")
+
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert "http_requests_total" in response.text

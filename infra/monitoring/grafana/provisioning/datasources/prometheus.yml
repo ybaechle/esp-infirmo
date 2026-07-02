@@ -1,0 +1,14 @@
+# Provisioning Grafana — datasource Prometheus (INF-15).
+# Chargé automatiquement au démarrage du conteneur grafana (profil
+# "monitoring"), pas de configuration manuelle requise dans l'UI.
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false

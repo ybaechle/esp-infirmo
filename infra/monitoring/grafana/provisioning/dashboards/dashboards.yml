@@ -1,0 +1,14 @@
+# Provisioning Grafana — chargement automatique des dashboards JSON du
+# dossier courant (INF-15). Chargé au démarrage du conteneur grafana.
+
+apiVersion: 1
+
+providers:
+  - name: infirmo
+    orgId: 1
+    folder: ""
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards

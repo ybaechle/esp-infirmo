@@ -8,7 +8,7 @@ Infrastructure-as-code, container images, and deployment manifests for Infirmo.
 - **Local dev:** Docker / Docker Compose
 - **Orchestration:** Kubernetes (manifests + Helm charts as workloads grow)
 
-This README is a placeholder for the Terraform/Kubernetes parts. Module layout (`terraform/<env>/`, `k8s/`, `charts/`) will be filled in by later infra tickets. The local Docker Compose setup (below) was delivered by **INF-8**; staging/production deployment (Docker Compose + GitHub Actions, no Kubernetes yet) was delivered by **INF-12/13/14** — see [`infra/deploy/`](deploy/README.md).
+This README is a placeholder for the Terraform/Kubernetes parts. Module layout (`terraform/<env>/`, `k8s/`, `charts/`) will be filled in by later infra tickets. The local Docker Compose setup (below) was delivered by **INF-8**; staging/production deployment (Docker Compose + GitHub Actions, no Kubernetes yet) was delivered by **INF-12/13/14** — see [`infra/deploy/`](deploy/README.md). Monitoring (**INF-15**), PostgreSQL backups (**INF-16**) and performance tests (**INF-17**) are documented in the "Opérations" section below.
 
 ## Démarrage local (Docker Compose)
 
@@ -16,7 +16,8 @@ Environnement de développement local uniquement — **données synthétiques
 uniquement**, ce n'est pas l'environnement HDS (voir la skill `hds-hosting`
 et AGENTS.md §5). Cette section reste volontairement minimale ; les
 environnements staging/production sont documentés dans la section
-"Environnements" ci-dessous. Monitoring et backups arrivent avec **INF-18**.
+"Environnements" ci-dessous, et monitoring/backups/perf dans la section
+"Opérations" ci-dessous.
 
 ### Prérequis
 
@@ -45,7 +46,7 @@ docker compose down
 | ------- | ---- | ------------------ |
 | `db` | PostgreSQL + PostGIS 16 | Non (voir `docker-compose.yml` pour activer ponctuellement) |
 | `redis` | Redis 7 (pub/sub, cache) | Non |
-| `backend` | API FastAPI (scaffold DevOps, INF-8) | `8000` |
+| `backend` | API FastAPI (scaffold DevOps, INF-8) — expose `/metrics` (INF-15) | `8000` |
 | `ia` | Microservice IA (scaffold, sans Whisper) | Non — appelable uniquement par `backend`, réseau `internal` |
 
 `backend/` et `ia/` sont pour l'instant des **scaffolds DevOps minimaux**
@@ -62,6 +63,17 @@ des équipes backend et IA.
 
 Aucune donnée de santé réelle ne doit transiter par les environnements local
 ou staging (AGENTS.md §5, skill `hds-hosting`).
+
+## Opérations (monitoring, backups, tests de performance)
+
+| Sujet | Ticket | Portée | Documentation |
+| ----- | ------ | ------ | -------------- |
+| Monitoring (Prometheus + Grafana) | **INF-15** | Profil `docker compose --profile monitoring`, dev local (données synthétiques) | [`infra/monitoring/`](monitoring/README.md) |
+| Sauvegardes PostgreSQL | **INF-16** | Scripts `backup.sh` / `restore.sh`, environnements local/staging (données synthétiques) — activité HDS n°6 pour les vraies données | [`infra/backup/`](backup/README.md) |
+| Tests de performance (k6) | **INF-17** | Smoke test `/health` + `/health/ready`, à lancer uniquement contre des environnements à données synthétiques | [`infra/perf/`](perf/README.md) |
+
+Comme le reste de cette page, ces trois volets ciblent le dev local et
+staging (données synthétiques) — pas l'environnement HDS (AGENTS.md §5).
 
 ## Owner(s)
 

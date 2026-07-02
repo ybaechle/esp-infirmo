@@ -14,8 +14,16 @@ import os
 import psycopg
 import redis
 from fastapi import FastAPI, Response
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI(title="infirmo-backend", version="0.1.0")
+
+# /metrics (INF-15) : compteurs/latences par route uniquement (métriques
+# Prometheus par défaut de l'instrumentator). AUCUNE donnée de santé ni
+# secret n'y transite : pas de corps de requête/réponse, pas de payload
+# métier — seulement méthode, chemin de la route, code de statut, durée
+# (AGENTS.md §5.6, "No PHI/secrets in observability").
+Instrumentator().instrument(app).expose(app)
 
 # Timeouts courts : un /health/ready doit répondre vite, y compris quand une
 # dépendance est injoignable (pas de docker, tests unitaires, etc.).
