@@ -211,7 +211,7 @@ docs/update-readme
 ci/backend-tests
 ```
 
-Les branches `main` et `develop` doivent être protégées. Toute modification doit passer par une Pull Request.
+Les branches `main` et `develop` doivent être protégées. Toute modification doit passer par une Pull Request. La configuration de protection est versionnée dans [`infra/github/`](infra/github/README.md).
 
 ---
 
