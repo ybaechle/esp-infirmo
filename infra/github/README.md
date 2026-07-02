@@ -67,6 +67,19 @@ gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch
   au format `<module>-vX.Y.Z` (`backend/.releaserc.json`, etc. — les
   `package.json` de module sont des manifestes de release, pas du code).
 
+## Intégration continue (INF-9 → INF-11)
+
+| Workflow | Fichier | Déclencheur | Contenu |
+| -------- | ------- | ----------- | ------- |
+| Commitlint | `commitlint.yml` | toute PR | commits + titre de PR conventionnels |
+| Backend CI | `backend-ci.yml` | changements `backend/**` | `ruff check` + `ruff format --check` + `pytest` (uv, lockfile) |
+| IA CI | `ia-ci.yml` | changements `ia/**` | idem backend |
+| Mobile CI | `mobile-ci.yml` | changements `mobile/**` | `dart format` + `flutter analyze` + `flutter test` (no-op vert tant que l'app Flutter n'est pas initialisée) |
+| Release | `release.yml` | push `main` | semantic-release par module |
+
+Les CI de module sont filtrées par chemin : elles ne tournent que quand le
+module change (plus leur propre fichier de workflow).
+
 ### Évolutions prévues
 
 - Ajouter les **status checks requis** (CI backend / mobile / IA / commitlint)

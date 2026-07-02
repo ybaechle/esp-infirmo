@@ -42,7 +42,11 @@ def health_ready(response: Response) -> dict:
     if not (postgres_ok and redis_ok):
         response.status_code = 503
 
-    return {"status": "ready" if postgres_ok and redis_ok else "not-ready", "postgres": postgres_ok, "redis": redis_ok}
+    return {
+        "status": "ready" if postgres_ok and redis_ok else "not-ready",
+        "postgres": postgres_ok,
+        "redis": redis_ok,
+    }
 
 
 def _check_postgres() -> bool:
@@ -50,7 +54,9 @@ def _check_postgres() -> bool:
     if not database_url:
         return False
     try:
-        with psycopg.connect(database_url, connect_timeout=_DB_CONNECT_TIMEOUT_SECONDS) as conn:
+        with psycopg.connect(
+            database_url, connect_timeout=_DB_CONNECT_TIMEOUT_SECONDS
+        ) as conn:
             conn.execute("SELECT 1")
         return True
     except psycopg.Error:
