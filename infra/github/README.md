@@ -86,3 +86,14 @@ module change (plus leur propre fichier de workflow).
   dans les rulesets une fois les noms de checks stabilisés — voir
   `.github/workflows/`. Ne pas exiger un check filtré par chemin : une PR qui ne
   déclenche pas le workflow resterait bloquée.
+
+## Déploiement (INF-12 → INF-14)
+
+| Workflow | Fichier | Déclencheur | Contenu |
+| -------- | ------- | ----------- | ------- |
+| Deploy Staging | `deploy-staging.yml` | push `develop` (chemins `backend/**`, `ia/**`, `infra/deploy/**`) ou `workflow_dispatch` ; PR sur le workflow → build de validation seul | Build + push GHCR (`backend`, `ia`) puis déploiement SSH sur le serveur staging |
+| Deploy Production | `deploy-production.yml` | push d'un tag `backend-v*` / `ia-v*` (semantic-release), ou `workflow_dispatch` (déploiement manuel / rollback) | Build + push GHCR (sur tag uniquement) puis déploiement SSH sur le serveur de production |
+
+Détail (architecture, secrets à configurer, procédure de rollback) :
+[`infra/deploy/README.md`](../deploy/README.md). Rappel hébergement de
+données de santé : [`infra/hds/README.md`](../hds/README.md).

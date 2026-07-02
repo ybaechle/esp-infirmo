@@ -8,14 +8,15 @@ Infrastructure-as-code, container images, and deployment manifests for Infirmo.
 - **Local dev:** Docker / Docker Compose
 - **Orchestration:** Kubernetes (manifests + Helm charts as workloads grow)
 
-This README is a placeholder for the Terraform/Kubernetes parts. Module layout (`terraform/<env>/`, `k8s/`, `charts/`), CI/CD wiring, and secrets handling will be filled in by later infra tickets. The local Docker Compose setup (below) was delivered by **INF-8**.
+This README is a placeholder for the Terraform/Kubernetes parts. Module layout (`terraform/<env>/`, `k8s/`, `charts/`) will be filled in by later infra tickets. The local Docker Compose setup (below) was delivered by **INF-8**; staging/production deployment (Docker Compose + GitHub Actions, no Kubernetes yet) was delivered by **INF-12/13/14** — see [`infra/deploy/`](deploy/README.md).
 
 ## Démarrage local (Docker Compose)
 
 Environnement de développement local uniquement — **données synthétiques
 uniquement**, ce n'est pas l'environnement HDS (voir la skill `hds-hosting`
-et AGENTS.md §5). Le détail complet (CI, déploiement, monitoring, backups)
-arrive avec **INF-18** ; cette section reste volontairement minimale.
+et AGENTS.md §5). Cette section reste volontairement minimale ; les
+environnements staging/production sont documentés dans la section
+"Environnements" ci-dessous. Monitoring et backups arrivent avec **INF-18**.
 
 ### Prérequis
 
@@ -50,6 +51,17 @@ docker compose down
 `backend/` et `ia/` sont pour l'instant des **scaffolds DevOps minimaux**
 (healthchecks uniquement) : ils seront remplacés par le code applicatif réel
 des équipes backend et IA.
+
+## Environnements
+
+| Environnement | Hébergement | Données | Documentation |
+| -------------- | ----------- | ------- | -------------- |
+| Local | `docker compose` sur la machine du développeur | Synthétiques | Ce fichier (§ "Démarrage local") |
+| Staging | Serveur Docker "nu", non-HDS (déploiement auto depuis `develop`) | **Synthétiques uniquement** | [`infra/deploy/`](deploy/README.md) |
+| Production — cible HDS | Hébergeur certifié HDS (OVHcloud recommandé), déploiement depuis les tags `semantic-release` | Réelles (une fois l'hébergement HDS contractualisé) | [`infra/hds/`](hds/README.md) (POC/cible) · [`infra/deploy/`](deploy/README.md) (pipeline) |
+
+Aucune donnée de santé réelle ne doit transiter par les environnements local
+ou staging (AGENTS.md §5, skill `hds-hosting`).
 
 ## Owner(s)
 
