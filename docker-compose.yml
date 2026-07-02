@@ -1,0 +1,97 @@
+# Docker Compose — environnement de développement local (INF-8).
+#
+# Portée : dev local uniquement, avec des données SYNTHÉTIQUES. Ce n'est pas
+# l'environnement HDS (voir la skill hds-hosting) : aucune donnée de santé
+# réelle ne doit transiter ici (AGENTS.md §5).
+#
+# Frontières réseau :
+#   - réseau "default" : backend <-> db, backend <-> redis.
+#   - réseau "internal" (non routable vers l'extérieur) : backend <-> ia
+#     uniquement. Le service ia n'est jamais publié sur l'hôte (voir
+#     project-architecture : ia est un microservice privé, appelé
+#     uniquement par backend/).
+#
+# Démarrage : voir infra/README.md ("Démarrage local (Docker Compose)").
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-infirmo}
+      # Pas de valeur par défaut pour le mot de passe : docker compose refuse
+      # de démarrer tant que POSTGRES_PASSWORD n'est pas défini dans .env.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.example)}
+      POSTGRES_DB: ${POSTGRES_DB:-infirmo}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Port non publié sur l'hôte par défaut : on réduit la surface
+    # d'exposition même en local. Décommenter ponctuellement pour se
+    # connecter avec un client SQL en dev.
+    # ports:
+    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infirmo} -d ${POSTGRES_DB:-infirmo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-infirmo}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.example)}@db:5432/${POSTGRES_DB:-infirmo}
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      # Publié sur BACKEND_PORT (défaut 8000) : modifiable dans .env si le
+      # port est déjà pris par un autre projet sur la machine.
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ia:
+    build: ./ia
+    restart: unless-stopped
+    # Scaffold DevOps (pas encore Whisper). Volontairement pas de "ports:" :
+    # ia ne doit jamais être joignable depuis l'hôte ou l'extérieur, seulement
+    # depuis backend sur le réseau "internal" (AGENTS.md §5, hds-hosting).
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  pgdata:
+
+networks:
+  # Réseau par défaut : db, redis et backend (créé implicitement, déclaré
+  # ici pour documenter explicitement qui y participe).
+  default:
+  # Réseau interne uniquement backend <-> ia, sans route vers l'extérieur.
+  internal:
+    internal: true
