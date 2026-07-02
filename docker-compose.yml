@@ -1,0 +1,157 @@
+# Docker Compose — environnement de développement local (INF-8).
+#
+# Portée : dev local uniquement, avec des données SYNTHÉTIQUES. Ce n'est pas
+# l'environnement HDS (voir la skill hds-hosting) : aucune donnée de santé
+# réelle ne doit transiter ici (AGENTS.md §5).
+#
+# Frontières réseau :
+#   - réseau "default" : backend <-> db, backend <-> redis.
+#   - réseau "internal" (non routable vers l'extérieur) : backend <-> ia
+#     uniquement. Le service ia n'est jamais publié sur l'hôte (voir
+#     project-architecture : ia est un microservice privé, appelé
+#     uniquement par backend/).
+#
+# Démarrage : voir infra/README.md ("Démarrage local (Docker Compose)").
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-infirmo}
+      # Pas de valeur par défaut pour le mot de passe : docker compose refuse
+      # de démarrer tant que POSTGRES_PASSWORD n'est pas défini dans .env.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.example)}
+      POSTGRES_DB: ${POSTGRES_DB:-infirmo}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Port non publié sur l'hôte par défaut : on réduit la surface
+    # d'exposition même en local. Décommenter ponctuellement pour se
+    # connecter avec un client SQL en dev.
+    # ports:
+    #   - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infirmo} -d ${POSTGRES_DB:-infirmo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-infirmo}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.example)}@db:5432/${POSTGRES_DB:-infirmo}
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      # Publié sur BACKEND_PORT (défaut 8000) : modifiable dans .env si le
+      # port est déjà pris par un autre projet sur la machine.
+      - "${BACKEND_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ia:
+    build: ./ia
+    restart: unless-stopped
+    # Scaffold DevOps (pas encore Whisper). Volontairement pas de "ports:" :
+    # ia ne doit jamais être joignable depuis l'hôte ou l'extérieur, seulement
+    # depuis backend sur le réseau "internal" (AGENTS.md §5, hds-hosting).
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # --- Profil "monitoring" (INF-15) --------------------------------------
+  # Désactivé par défaut : démarrer avec
+  #   docker compose --profile monitoring up -d
+  # Scrape uniquement /metrics du backend (compteurs/latences par route,
+  # jamais de contenu de requête — AGENTS.md §5.6). Voir
+  # infra/monitoring/README.md.
+
+  prometheus:
+    image: prom/prometheus:v3.9.1
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    volumes:
+      - ./infra/monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/-/healthy || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana:12.3.0
+    profiles: ["monitoring"]
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      # Pas de valeur par défaut : docker compose refuse de démarrer tant que
+      # GRAFANA_ADMIN_PASSWORD n'est pas défini dans .env.
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD doit etre defini dans .env (cf .env.example)}
+      # Accès anonyme désactivé explicitement (défaut Grafana, réaffirmé ici
+      # par exigence de durcissement — AGENTS.md §5).
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  pgdata:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  # Réseau par défaut : db, redis et backend (créé implicitement, déclaré
+  # ici pour documenter explicitement qui y participe). prometheus/grafana
+  # (profil "monitoring") y sont aussi : ils doivent joindre backend:8000.
+  default:
+  # Réseau interne uniquement backend <-> ia, sans route vers l'extérieur.
+  internal:
+    internal: true

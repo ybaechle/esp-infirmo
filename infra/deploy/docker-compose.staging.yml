@@ -1,0 +1,116 @@
+# Docker Compose — environnement STAGING (INF-12, INF-13).
+#
+# Portée : hébergement Docker "nu" (pas encore HDS — voir infra/hds/README.md).
+# Données SYNTHÉTIQUES UNIQUEMENT : aucune donnée de santé réelle ici tant que
+# l'hébergement n'est pas certifié HDS (AGENTS.md §5, skill hds-hosting).
+#
+# Différences avec le docker-compose.yml de dev local (racine du dépôt) :
+#   - backend/ia sont des images publiées sur GHCR par le workflow
+#     deploy-staging.yml (INF-13), jamais construites sur le serveur
+#     ("build:" -> "image:").
+#   - Caddy termine le TLS (HTTPS automatique) et est le seul service publié
+#     sur l'hôte (80/443) ; backend n'est plus publié directement.
+#
+# Ce fichier est conçu pour être redéployé tel quel sur la future VM HDS (voir
+# infra/hds/README.md §4 "Chemin de migration") : seuls l'hébergeur et le
+# contenu de .env changent, pas la structure du compose.
+#
+# Démarrage et secrets : voir infra/deploy/README.md.
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-infirmo}
+      # Pas de valeur par défaut pour le mot de passe : docker compose refuse
+      # de démarrer tant que POSTGRES_PASSWORD n'est pas défini dans .env.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.staging.example)}
+      POSTGRES_DB: ${POSTGRES_DB:-infirmo}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # Jamais publié sur l'hôte : seul Caddy est exposé (80/443).
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infirmo} -d ${POSTGRES_DB:-infirmo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    # Image publiée sur GHCR (jamais buildée sur le serveur) — voir
+    # .env.staging.example et le job build-push de deploy-staging.yml.
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE doit etre defini dans .env (cf .env.staging.example)}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-infirmo}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.staging.example)}@db:5432/${POSTGRES_DB:-infirmo}
+      REDIS_URL: redis://redis:6379/0
+    # Pas de "ports:" : backend n'est joignable que via Caddy, sur le réseau
+    # "default" — jamais publié directement sur l'hôte.
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - default
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  ia:
+    image: ${IA_IMAGE:?IA_IMAGE doit etre defini dans .env (cf .env.staging.example)}
+    restart: unless-stopped
+    # Jamais publié, ni sur l'hôte ni via Caddy : joignable uniquement depuis
+    # backend, réseau "internal" (mêmes frontières que docker-compose.yml en
+    # local — voir project-architecture : ia est un microservice privé).
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=2)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      # Lu par le Caddyfile ({$STAGING_DOMAIN}) pour l'adresse du site et le
+      # certificat TLS automatique (HTTPS via Let's Encrypt).
+      STAGING_DOMAIN: ${STAGING_DOMAIN:?STAGING_DOMAIN doit etre defini dans .env (cf .env.staging.example)}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  # Réseau par défaut : db, redis, backend et caddy.
+  default:
+  # Réseau interne uniquement backend <-> ia, sans route vers l'extérieur.
+  internal:
+    internal: true

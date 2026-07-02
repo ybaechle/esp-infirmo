@@ -1,0 +1,13 @@
+# Ne pas envoyer ces fichiers dans le build context (image plus légère,
+# et on évite qu'un .env local finisse dans une couche de l'image).
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.git/
+.env
+.env.*
+!.env.example
+tests/
+README.md

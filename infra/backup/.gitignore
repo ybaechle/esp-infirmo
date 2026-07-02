@@ -1,0 +1,4 @@
+# Dumps PostgreSQL locaux/staging (INF-16) : jamais committés, même
+# synthétiques — ce dossier est un espace de travail local, pas une archive.
+dumps/
+!dumps/.gitkeep

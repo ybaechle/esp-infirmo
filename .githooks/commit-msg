@@ -1,0 +1,4 @@
+#!/bin/sh
+# Valide le message de commit avec commitlint (Conventional Commits).
+# Installé via `npm install` (script "prepare" → core.hooksPath .githooks).
+npx --no-install commitlint --edit "$1"

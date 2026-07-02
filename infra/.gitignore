@@ -19,6 +19,7 @@ docker-compose.override.yaml
 .env
 .env.*
 !.env.example
+!.env.staging.example
 
 # Kubernetes
 kubeconfig

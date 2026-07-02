@@ -1,0 +1,30 @@
+# infirmo-ia
+#
+# Scaffold DevOps minimal (INF-8 — Docker Compose local). Ce service n'est
+# qu'un squelette FastAPI exposant /health, SANS dépendance Whisper/ML.
+# L'équipe IA (Pierre-Arthur) le remplacera par le microservice de
+# transcription réel. Rappel compliance : ce service ne doit jamais être
+# exposé publiquement — il n'est appelable que par backend/, sur le réseau
+# interne (voir docker-compose.yml et project-architecture skill).
+
+[project]
+name = "infirmo-ia"
+version = "0.1.0"
+description = "Microservice IA Infirmo (Whisper, à venir) — scaffold DevOps, à remplacer par l'équipe IA"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi~=0.139.0",
+    "uvicorn[standard]~=0.49.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx~=0.28.1",
+    "pytest~=9.1.1",
+    "ruff~=0.15.20",
+]
+
+[tool.pytest.ini_options]
+# Rend `app` importable depuis tests/ sans installer le paquet (pas de
+# build-system : ce scaffold n'est pas destiné à être packagé/publié).
+pythonpath = ["."]

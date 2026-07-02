@@ -1,0 +1,5 @@
+# Reverse proxy TLS automatique (HTTPS/Let's Encrypt) vers le backend (INF-12).
+{$STAGING_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy backend:8000
+}

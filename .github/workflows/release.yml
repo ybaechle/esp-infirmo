@@ -1,0 +1,41 @@
+name: Release
+
+# semantic-release par module : tags backend-vX.Y.Z, ia-vX.Y.Z, mobile-vX.Y.Z
+# à partir de l'historique Conventional Commits (voir CONTRIBUTING.md §10).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency: release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    strategy:
+      # séquentiel : évite les courses sur les tags/releases
+      max-parallel: 1
+      matrix:
+        module: [backend, ia, mobile]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: semantic-release ${{ matrix.module }}
+        working-directory: ${{ matrix.module }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
