@@ -1,0 +1,6 @@
+{
+  "name": "mobile",
+  "version": "0.0.0-semantic-release",
+  "private": true,
+  "description": "Manifeste de release uniquement (semantic-release, tags mobile-vX.Y.Z). Ne contient pas de code."
+}

@@ -1,0 +1,6 @@
+{
+  "name": "ia",
+  "version": "0.0.0-semantic-release",
+  "private": true,
+  "description": "Manifeste de release uniquement (semantic-release, tags ia-vX.Y.Z). Ne contient pas de code."
+}

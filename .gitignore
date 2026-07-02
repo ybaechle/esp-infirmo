@@ -9,6 +9,9 @@ Thumbs.db
 .idea/
 .vscode/
 
+# Node (outillage racine : commitlint, commitizen, semantic-release)
+node_modules/
+
 # Stray root-level local env files
 .env
 .env.local

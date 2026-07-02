@@ -53,6 +53,20 @@ gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch
 gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch-develop.json
 ```
 
+## Commits et releases (INF-4 → INF-6)
+
+- **Commitlint** : chaque commit et chaque titre de PR respectent les
+  Conventional Commits (`commitlint.config.js`, workflow
+  `.github/workflows/commitlint.yml`). Le hook local s'installe avec
+  `npm install` à la racine (script `prepare` → `.githooks/commit-msg`).
+- **Commits guidés** : `npm run commit` (ou `npx git-cz`) pose les questions
+  et construit un message conforme.
+- **semantic-release** : à chaque push sur `main`, le workflow
+  `.github/workflows/release.yml` calcule la prochaine version de chaque
+  module depuis l'historique de commits et publie tags + releases GitHub
+  au format `<module>-vX.Y.Z` (`backend/.releaserc.json`, etc. — les
+  `package.json` de module sont des manifestes de release, pas du code).
+
 ### Évolutions prévues
 
 - Ajouter les **status checks requis** (CI backend / mobile / IA / commitlint)

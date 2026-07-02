@@ -1,0 +1,26 @@
+{
+  "name": "infirmo-devtools",
+  "private": true,
+  "description": "Outillage racine INFIRMO : commitlint, commitizen, semantic-release. Le code applicatif vit dans mobile/, backend/, ia/.",
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
+    "commit": "git-cz",
+    "commitlint": "commitlint --from origin/develop --to HEAD --verbose"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "semantic-release": "^24.2.5",
+    "semantic-release-monorepo": "^8.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
