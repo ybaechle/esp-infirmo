@@ -51,10 +51,10 @@ PDR et durée d'installation : **non mesurés**. Aucun protocole complet chronom
 
 ## Intégration continue
 
-Instantané : 2026-09-15T13:05:26.838208+00:00; `EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1`, branche `develop`, latest 100 runs (or fewer if unavailable).
+Instantané : 2026-09-15T13:32:26.655978+00:00; `EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1`, branche `develop`, latest 100 runs (or fewer if unavailable).
 
-- Succès : 0/4; taux global 0.00 %.
-- Échecs exécutés : 0; blocages d'infrastructure : 4.
+- Succès : 0/7; taux global 0.00 %.
+- Échecs exécutés : 0; blocages d'infrastructure : 7.
 - Ignorés : 0; annulés : 0; en cours : 0.
 - Autres résultats terminaux (timeouts, approbations requises, etc.) : 0.
 - Taux de succès des runs exécutés succès/échec : Non mesuré.

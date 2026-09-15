@@ -17,8 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check operational scripts
-        run: bash infra/test_operations.sh
+      - name: Check operational scripts and reporting calculations
+        run: |
+          bash infra/test_operations.sh
+          python3 -m unittest discover -s reporting -p 'test_*.py'
       - name: Cold-start executable increment
         run: |
           cp .env.example .env

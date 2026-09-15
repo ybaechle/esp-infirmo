@@ -17,7 +17,7 @@ jobs:
           POSTGRES_PASSWORD: ci-synthetic
           POSTGRES_DB: infirmo_test
         ports: ["5432:5432"]
-        options: --health-cmd "pg_isready -U infirmo -d infirmo_test" --health-interval 5s --health-retries 10
+        options: --health-cmd "pg_isready -h 127.0.0.1 -U infirmo -d infirmo_test" --health-interval 5s --health-retries 10
       redis:
         image: redis:7-alpine
         ports: ["6379:6379"]
