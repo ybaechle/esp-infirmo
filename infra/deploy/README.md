@@ -1,176 +1,52 @@
-# infra/deploy/ — staging & production (INF-12, INF-13, INF-14)
+# Deployment and rollback
 
-Runbook de déploiement pour l'environnement **staging** (hébergement Docker
-non-HDS, données **synthétiques uniquement**) et pour le **déploiement
-production** (tags `semantic-release`), avec sa procédure de **rollback**.
+These workflows are configuration, not evidence that staging or production exists. Only synthetic data is authorized for the current demonstration. See [hosting requirements](../hds/README.md).
 
-> Rappel obligation légale : voir [`../hds/README.md`](../hds/README.md) et
-> AGENTS.md §5. Aucune donnée de santé réelle sur l'environnement staging.
+## Server prerequisites
 
-## 1. Architecture staging
+A Linux server needs Docker with Compose v2 (`--wait` and multiple `--env-file` supported), a dedicated SSH account, outbound GHCR access, and a domain pointing to the server for Caddy TLS. Authenticate the server to private GHCR using a read-only package credential. The server directory is `~/infirmo`.
 
-```text
-                        Internet (80/443)
-                              │
-                              ▼
-                        ┌───────────┐
-                        │   caddy   │  TLS automatique (Let's Encrypt)
-                        │ (publié)  │
-                        └─────┬─────┘
-                              │ réseau "default"
-                              ▼
-                        ┌───────────┐        ┌───────────┐
-                        │  backend  │◄──────►│    db     │
-                        │ (FastAPI) │        │ (Postgis) │
-                        └─────┬─────┘        └───────────┘
-                              │ réseau "internal"   ▲
-                              ▼                     │ réseau "default"
-                        ┌───────────┐        ┌───────────┐
-                        │    ia     │        │   redis   │
-                        │ (Whisper) │        └───────────┘
-                        └───────────┘
-```
+Copy `.env.staging.example` to `~/infirmo/.env` on the server and configure the database password, domain and all three initial image references. Do not use `develop` or `latest` images. For the synthetic demonstration only, set `INFIRMO_DEMO_MODE=true` and set a unique `INFIRMO_DEMO_PASSWORD`. Otherwise leave demo mode false. No demo identity is seeded when disabled.
 
-Seul `caddy` est publié sur l'hôte (80/443). `backend` n'est joignable que
-via `caddy` ; `ia` n'est joignable que depuis `backend`, sur le réseau
-interne `internal` (non routable vers l'extérieur) — mêmes frontières que le
-`docker-compose.yml` de dev local (voir `project-architecture`).
+Configure GitHub environments `staging` and `production`. Production should require a human reviewer. Configure each environment's secrets:
 
-`backend` et `ia` sont des **images publiées sur GHCR**, jamais construites
-sur le serveur (`image:`, pas `build:`) — voir §3.
+| Staging | Production | Value |
+| --- | --- | --- |
+| STAGING_SSH_HOST | PROD_SSH_HOST | Server address |
+| STAGING_SSH_USER | PROD_SSH_USER | Dedicated user |
+| STAGING_SSH_KEY | PROD_SSH_KEY | Private deployment key |
+| STAGING_SSH_KNOWN_HOSTS | PROD_SSH_KNOWN_HOSTS | Host key verified with the server operator |
 
-## 2. Premier déploiement d'un serveur
+Do not derive trust by scanning the host during deployment. A missing secret fails the deployment visibly. No workflow provisions a paid server.
 
-Prérequis sur le serveur cible :
+## Staging
 
-- Docker + le plugin `docker compose` (v2) installés.
-- Un utilisateur SSH dédié au déploiement (clé publique autorisée, pas de mot
-  de passe).
-- Le DNS de `STAGING_DOMAIN` pointe déjà vers le serveur (nécessaire pour que
-  Caddy obtienne un certificat TLS automatiquement).
+`Deploy Staging` follows a successful `Quality` push run on `develop` and checks out that exact tested commit. It builds backend, IA and mobile images tagged with the full commit SHA. It copies the same revision's Compose, Caddyfile and `deploy.sh` to the server before deploying.
 
-Étapes :
+`deploy.sh` records image selections in the server's `.images.env`, invokes Compose with both `.env` and `.images.env`, waits up to 180 seconds for healthy containers, checks actual PostgreSQL/Redis readiness, and reloads Caddy. The image file records the requested selection even if readiness fails; a failed attempt must be recorded and explicitly rolled back. A green container readiness check is not third-party functional acceptance.
 
-```bash
-# 1. Créer le dossier de déploiement.
-mkdir -p ~/infirmo
+Staging also copies the acceptance script from the tested revision and runs it after readiness inside the backend container, using its synthetic demo credentials against `http://mobile`. This verifies the deployed reverse proxy, login, persistence and logout; a failed check fails the workflow. Staging therefore requires `INFIRMO_DEMO_MODE=true` and a configured synthetic password. Production does not run this demo acceptance.
 
-# 2. Copier docker-compose.staging.yml et Caddyfile sur le serveur, dans
-#    ~/infirmo/ (scp, ou un clone git peu profond du dépôt).
-scp infra/deploy/docker-compose.staging.yml infra/deploy/Caddyfile \
-    <user>@<host>:~/infirmo/
+For independent public TLS validation, run `python infra/check_v01.py --url https://your-domain` with the synthetic credentials supplied through `INFIRMO_DEMO_EMAIL` and `INFIRMO_DEMO_PASSWORD`. Record the tester, commit, duration and result in `/reporting/`. Never print credentials in reports.
 
-# 3. Copier le fichier d'exemple sous le nom ".env" (docker compose charge
-#    automatiquement le ".env" situé à côté du fichier compose utilisé avec
-#    -f — voir la doc Docker Compose sur le "project directory").
-cp infra/deploy/.env.staging.example ~/infirmo/.env
-# puis éditer ~/infirmo/.env sur le serveur : POSTGRES_PASSWORD,
-# BACKEND_IMAGE, IA_IMAGE, STAGING_DOMAIN. Ne jamais committer ce fichier.
+## Production handoff
 
-# 4. Premier démarrage.
+`Release` runs the quality suite before semantic-release. Each newly created module tag explicitly dispatches `Deploy Production` with `build=true`; this works with `GITHUB_TOKEN`, whose tag pushes do not trigger another push workflow. The production job validates module/version, checks out the exact release tag, builds that module's versioned image, synchronizes release configuration and persists its selected image in `.images.env`.
+
+Module release tags identify the whole repository revision used for deployment configuration. They are not proof that the complete academic increment has been accepted. Avoid concurrent manual changes to the server files.
+
+## Rollback
+
+Use Actions → Deploy Production → Run workflow, choose the module and a previously validated version, and leave `build=false`. The image must already exist in GHCR. All other module image selections remain persisted in `.images.env`; a later Compose invocation retains them when using the same env files.
+
+A rollback changes application images and revision configuration. It does not automatically reverse database migrations. Review schema compatibility and take a validated backup before any destructive migration. Do not select an older tag that lacks the deployment script/configuration introduced with v0.1.
+
+Manual inspection on the server:
+
+```sh
 cd ~/infirmo
-docker compose -f docker-compose.staging.yml pull
-docker compose -f docker-compose.staging.yml up -d
-
-# 5. Vérifier.
-curl https://<STAGING_DOMAIN>/health
+docker compose --env-file .env --env-file .images.env -f docker-compose.staging.yml ps
+curl --fail https://your-domain/health/ready
 ```
 
-## 3. Déploiement automatique staging (INF-13)
-
-Workflow : [`deploy-staging.yml`](../../.github/workflows/deploy-staging.yml).
-
-1. Un push sur `develop` qui touche `backend/**`, `ia/**`, `infra/deploy/**`
-   (ou le workflow lui-même) déclenche le job **build-push** : build des
-   images `backend` et `ia`, publication sur GHCR taguées `develop` et
-   `sha-<sha-court>`.
-2. Le job **deploy** se connecte en SSH au serveur staging et exécute
-   `docker compose -f ~/infirmo/docker-compose.staging.yml pull` puis
-   `up -d` : les conteneurs redémarrent avec les images `:develop`
-   fraîchement publiées (référencées par `BACKEND_IMAGE`/`IA_IMAGE` dans
-   `~/infirmo/.env`).
-3. `workflow_dispatch` permet de rejouer le déploiement manuellement.
-4. Une pull request qui touche uniquement `deploy-staging.yml` déclenche à la
-   place **build-validation** : les images sont construites (pas publiées)
-   pour donner un check vert sans droits d'écriture sur le registre.
-
-Si les secrets SSH (§6) ne sont pas configurés, le job **deploy** affiche un
-`::notice::` et se termine proprement (`exit 0`) — le pipeline reste vert
-tant qu'aucun serveur staging n'est encore provisionné.
-
-## 4. Déploiement production (INF-14)
-
-Workflow : [`deploy-production.yml`](../../.github/workflows/deploy-production.yml).
-
-La production se déclenche sur les tags `backend-vX.Y.Z` / `ia-vX.Y.Z` créés
-par `semantic-release` (voir `release.yml`, déclenché par un push sur
-`main`) :
-
-1. Le push du tag construit l'image du module concerné et la publie sur GHCR
-   avec le tag exact de version (`vX.Y.Z`, immuable).
-2. Le job se connecte en SSH au serveur de production et exécute, pour le
-   seul module concerné :
-   `docker compose -f ~/infirmo/docker-compose.staging.yml pull <module>`
-   puis `up -d <module>` — l'autre module n'est pas touché.
-
-`BACKEND_IMAGE` (ou `IA_IMAGE`) est exporté avec la version pinnée
-uniquement pour cette invocation SSH ; le `.env` persistant sur le serveur
-n'a pas besoin d'être réécrit à chaque déploiement.
-
-> Le même fichier compose sert pour staging et pour un futur serveur de
-> production/HDS (voir [`../hds/README.md`](../hds/README.md) §4) : seul le
-> contenu de `.env` et l'hébergeur diffèrent entre les deux.
-
-## 5. Procédure de rollback
-
-Les images GHCR sont **immuables** : "rollback" = redéployer une version
-antérieure déjà publiée, pas reconstruire quoi que ce soit.
-
-1. Retrouver la version précédente du module concerné :
-
-   ```bash
-   git tag -l 'backend-v*' | sort -V
-   # ou pour ia :
-   git tag -l 'ia-v*' | sort -V
-   ```
-
-   La version à redéployer est celle qui précède la version actuellement en
-   production dans cette liste triée.
-
-2. Aller sur **Actions → Deploy Production → Run workflow**
-   (`workflow_dispatch`).
-3. Renseigner :
-   - `module` : `backend` ou `ia` ;
-   - `version` : la version antérieure identifiée à l'étape 1, ex. `v1.2.2`.
-4. Lancer le workflow. Comme l'événement est `workflow_dispatch` (pas un
-   push de tag), **aucun build n'est déclenché** : le workflow tire
-   directement `ghcr.io/<repo>/<module>:v1.2.2` (déjà publiée) et
-   redémarre le seul conteneur `<module>` avec cette image.
-5. Vérifier `curl https://<domaine-production>/health` puis surveiller les
-   logs/métriques (sans donnée de santé — voir AGENTS.md §5.6).
-
-## 6. Secrets GitHub à configurer
-
-À définir dans **Settings → Secrets and variables → Actions** du dépôt.
-Tant qu'un environnement n'a pas de serveur provisionné, laisser ses secrets
-vides : les workflows sautent proprement le déploiement (§3).
-
-| Secret | Environnement | Contenu |
-| ------ | -------------- | ------- |
-| `STAGING_SSH_HOST` | staging | Adresse (IP ou domaine) du serveur staging |
-| `STAGING_SSH_USER` | staging | Utilisateur SSH de déploiement |
-| `STAGING_SSH_KEY` | staging | Clé privée SSH dédiée (jamais réutilisée ailleurs) |
-| `PROD_SSH_HOST` | production | Adresse du serveur de production |
-| `PROD_SSH_USER` | production | Utilisateur SSH de déploiement |
-| `PROD_SSH_KEY` | production | Clé privée SSH dédiée |
-
-`GITHUB_TOKEN` (publication sur GHCR) est fourni automatiquement par
-GitHub Actions — pas de secret à créer pour ça.
-
-## 7. Rappel synthétique / HDS
-
-L'environnement **staging** décrit ici est un hébergement Docker **non
-certifié HDS** : **données synthétiques uniquement**, aucune donnée de santé
-réelle (AGENTS.md §5). La cible d'hébergement certifiée HDS, la checklist de
-migration et le périmètre concerné sont documentés dans
-[`../hds/README.md`](../hds/README.md).
+No production deployment, paid provisioning, or remote configuration is performed by merely adding these files.

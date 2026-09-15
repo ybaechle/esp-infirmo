@@ -15,3 +15,8 @@ node_modules/
 # Stray root-level local env files
 .env
 .env.local
+
+# Generated validation output (publish selected summaries under reporting/evidence).
+**/__pycache__/
+.coverage*
+**/test-results.xml

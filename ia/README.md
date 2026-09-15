@@ -1,26 +1,18 @@
-# ia/
+# ia/ — private service scaffold
 
-AI/ML workbench for Infirmo: experimentation, training pipelines, and model serving.
+Owner: Pierre-Arthur Toutouom Yountebo. The service currently exposes `/health` only; Whisper transcription is not implemented and is outside the v0.1 login/profile increment.
 
-## Stack
+## Reproduce validation
 
-- **Language:** Python (3.x — pinned in the IA scaffold ticket)
-- **Notebooks:** Jupyter (`.ipynb`) for exploration
-- **Frameworks:** TBD — expected mix of PyTorch, scikit-learn, Hugging Face Transformers
-- **Experiment tracking:** TBD (W&B / MLflow are pre-ignored to keep the option open)
+Prerequisites: Python 3.12 and uv 0.11.17. From `ia/`:
 
-This README is a placeholder. Concrete environment setup (`pyproject.toml`/`requirements.txt`, dataset access, model registry) will be filled in by the IA scaffold ticket.
+```sh
+uv sync --locked --python 3.12
+uv run ruff check .
+uv run ruff format --check .
+uv run pytest -q --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70 --junitxml=test-results.xml
+```
 
-## Conventions (provisional)
-
-- Datasets live under `data/` and are **not** committed (large files use external storage / DVC).
-- Trained models live under `models/` or `checkpoints/` and are **not** committed — publish through the model registry instead.
-- Notebooks should be cleared of outputs before commit (`nbstripout` is recommended).
-
-## Owner(s)
-
-- TBD
-
-## Versioning
+Coverage measures the existing scaffold only; it is not transcription coverage. CI uploads `coverage.xml` and `test-results.xml`. The image is built from this lockfile by root Docker Compose; IA remains on a private network reachable only by the backend. Use synthetic test data only.
 
 Released independently as `ia-vX.Y.Z`.

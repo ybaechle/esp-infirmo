@@ -7,7 +7,7 @@ qu'elle n'atteigne staging/production.
 ## Portée & garde-fou de conformité
 
 **Ne cibler que des environnements à données SYNTHÉTIQUES** (local,
-staging — voir AGENTS.md §5 et `infra/hds/README.md`). Ne jamais lancer de
+staging — voir AGENTS.md et `infra/hds/README.md`). Ne jamais lancer de
 test de charge contre un environnement contenant de vraies données de santé
 sans autorisation explicite : même un test « léger » génère du trafic
 soutenu qui peut dégrader un service en production, et le principe de

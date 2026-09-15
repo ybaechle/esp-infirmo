@@ -41,8 +41,13 @@ Closes #<!-- INF-XX or issue number -->
 - [ ] Lint / type-check passent en CI.
 - [ ] Pas de secret, token, ni fichier sensible commité (`.env`, `*.tfvars`, `secrets/`…).
 - [ ] Documentation / README du module à jour si nécessaire.
+- [ ] `Quality gate` exécuté et vert au commit proposé; aucun succès fondé sur une étape ignorée.
+- [ ] Heures réelles et ETC actualisés dans le ticket / `reporting/effort.csv`.
+- [ ] Écarts de procédure et reprises liés au `reporting/delta-log.csv`.
+- [ ] ADR ajouté ou mis à jour pour les décisions structurelles.
+- [ ] Validation recette avec commit, readiness et preuve du parcours; validation indépendante pour la livraison d'incrément.
 
-### Conformité données de santé / Health-data compliance — `AGENTS.md §5`
+### Conformité données de santé / Health-data compliance — `AGENTS.md`
 
 > Cocher **N/A** uniquement si le changement ne touche **aucune** donnée personnelle
 > ou de santé (y compris logs, fixtures, audio/voix, config d'hébergement).

@@ -1,108 +1,73 @@
 name: Deploy Production
-
-# INF-14 — déploiement d'une version taguée (créée par semantic-release, voir
-# release.yml) sur le serveur de production, avec rollback.
-#
-# - push d'un tag backend-vX.Y.Z / ia-vX.Y.Z : build + push l'image sur GHCR
-#   puis déploie cette version.
-# - workflow_dispatch (module + version) : déploiement manuel, SANS build —
-#   l'image doit déjà exister sur GHCR. C'est aussi le mécanisme de
-#   rollback : les images GHCR sont immuables, "revenir en arrière" = choisir
-#   une version antérieure déjà publiée et la redéployer.
 on:
-  push:
-    tags:
-      - "backend-v*"
-      - "ia-v*"
   workflow_dispatch:
     inputs:
       module:
-        description: "Module à déployer"
+        description: Module
         required: true
         type: choice
-        options:
-          - backend
-          - ia
+        options: [backend, ia, mobile]
       version:
-        description: "Version à déployer, ex. v1.2.3 (rollback = une version antérieure déjà publiée sur GHCR)"
+        description: Existing release version, for example v1.2.3
         required: true
         type: string
-
+      build:
+        description: Build the released revision (false for rollback)
+        default: false
+        type: boolean
 permissions:
   contents: read
   packages: write
-
+concurrency: deploy-production
 jobs:
   deploy:
-    name: Build (si tag) + déploiement production
     runs-on: ubuntu-latest
+    environment: production
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Déterminer le module et la version
-        id: target
+      - name: Validate target
+        env:
+          MODULE: ${{ inputs.module }}
+          VERSION: ${{ inputs.version }}
         run: |
-          if [ "${{ github.event_name }}" = "push" ]; then
-            REF_NAME="${GITHUB_REF_NAME}"
-            MODULE="${REF_NAME%-v*}"
-            VERSION="v${REF_NAME#*-v}"
-          else
-            MODULE="${{ inputs.module }}"
-            VERSION="${{ inputs.version }}"
-          fi
-          echo "module=$MODULE" >> "$GITHUB_OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Nom d'image en minuscules
-        id: vars
-        run: echo "image_base=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-
-      - uses: docker/setup-buildx-action@v3
-        if: github.event_name == 'push'
-
-      - name: Connexion GHCR
-        if: github.event_name == 'push'
-        uses: docker/login-action@v3
+          [[ "$MODULE" =~ ^(backend|ia|mobile)$ ]] && [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo 'Invalid release target'; exit 1; }
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.module }}-${{ inputs.version }}
+      - name: Validate deployment configuration
+        env:
+          HOST: ${{ secrets.PROD_SSH_HOST }}
+          USER: ${{ secrets.PROD_SSH_USER }}
+          KEY: ${{ secrets.PROD_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.PROD_SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$HOST" && test -n "$USER" && test -n "$KEY" && test -n "$KNOWN_HOSTS" || { echo '::error::Missing production SSH configuration'; exit 1; }
+          mkdir -p ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - uses: docker/login-action@v3
+        if: inputs.build
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build + push (uniquement sur tag — pas de build en rollback manuel)
-        if: github.event_name == 'push'
-        uses: docker/build-push-action@v6
-        with:
-          context: ./${{ steps.target.outputs.module }}
-          push: true
-          tags: ghcr.io/${{ steps.vars.outputs.image_base }}/${{ steps.target.outputs.module }}:${{ steps.target.outputs.version }}
-
-      - name: Déployer sur le serveur de production
+      - name: Build released image
+        if: inputs.build
         env:
-          PROD_SSH_HOST: ${{ secrets.PROD_SSH_HOST }}
-          PROD_SSH_USER: ${{ secrets.PROD_SSH_USER }}
-          PROD_SSH_KEY: ${{ secrets.PROD_SSH_KEY }}
-          MODULE: ${{ steps.target.outputs.module }}
-          IMAGE: ghcr.io/${{ steps.vars.outputs.image_base }}/${{ steps.target.outputs.module }}:${{ steps.target.outputs.version }}
+          MODULE: ${{ inputs.module }}
+          VERSION: ${{ inputs.version }}
         run: |
-          set -euo pipefail
-
-          if [ -z "$PROD_SSH_HOST" ] || [ -z "$PROD_SSH_USER" ] || [ -z "$PROD_SSH_KEY" ]; then
-            echo "::notice::Pas de serveur de production configuré — déploiement sauté"
-            exit 0
-          fi
-
-          mkdir -p ~/.ssh
-          printf '%s\n' "$PROD_SSH_KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "$PROD_SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-
-          # BACKEND_IMAGE ou IA_IMAGE selon le module, exporté avec la version
-          # pinnée uniquement pour cette invocation (voir infra/deploy/README.md).
-          MODULE_UPPER=$(echo "$MODULE" | tr '[:lower:]' '[:upper:]')
-
-          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$PROD_SSH_USER@$PROD_SSH_HOST" bash -s <<REMOTE
-            set -e
-            export ${MODULE_UPPER}_IMAGE="$IMAGE"
-            docker compose -f ~/infirmo/docker-compose.staging.yml pull $MODULE
-            docker compose -f ~/infirmo/docker-compose.staging.yml up -d $MODULE
-          REMOTE
+          image="ghcr.io/${GITHUB_REPOSITORY,,}/$MODULE:$VERSION"
+          docker build -t "$image" "$MODULE"
+          docker push "$image"
+      - name: Synchronize release configuration and deploy
+        env:
+          HOST: ${{ secrets.PROD_SSH_HOST }}
+          USER: ${{ secrets.PROD_SSH_USER }}
+          MODULE: ${{ inputs.module }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}/$MODULE:$VERSION"
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$USER@$HOST" 'mkdir -p ~/infirmo'
+          scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes infra/deploy/docker-compose.staging.yml infra/deploy/Caddyfile infra/deploy/deploy.sh "$USER@$HOST:infirmo/"
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$USER@$HOST" "bash ~/infirmo/deploy.sh $MODULE $image"

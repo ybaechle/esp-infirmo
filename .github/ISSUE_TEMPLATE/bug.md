@@ -10,7 +10,7 @@ assignees: ''
 
 <!-- Ce qui se passe, avec le message d'erreur exact si disponible.
      ⚠️ Jamais de donnée de santé réelle ni de secret dans un ticket :
-     reproduire avec des données synthétiques (AGENTS.md §5). -->
+     reproduire avec des données synthétiques (AGENTS.md). -->
 
 ## Comportement attendu
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # infra/backup/restore.sh — restauration PostgreSQL locale/staging (INF-16).
 #
-# COMPLIANCE (AGENTS.md §5, infra/hds/README.md) : comme backup.sh, ce script
+# COMPLIANCE (AGENTS.md, infra/hds/README.md) : comme backup.sh, ce script
 # vise les environnements LOCAL et STAGING (données SYNTHÉTIQUES uniquement).
 # Sur l'environnement HDS cible, la restauration relève du dispositif certifié
 # de l'hébergeur (activité 6) — voir ../hds/README.md.
@@ -17,7 +17,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-ENV_FILE="${REPO_ROOT}/.env"
+COMPOSE_FILE="${COMPOSE_FILE:-${REPO_ROOT}/docker-compose.yml}"
+ENV_FILE="${ENV_FILE:-${REPO_ROOT}/.env}"
+compose=(docker compose --env-file "$ENV_FILE" -f "$COMPOSE_FILE")
+if [ -n "${IMAGES_ENV_FILE:-}" ]; then
+  compose=(docker compose --env-file "$ENV_FILE" --env-file "$IMAGES_ENV_FILE" -f "$COMPOSE_FILE")
+fi
 
 usage() {
   echo "Usage: $0 [-y] <fichier.dump>" >&2
@@ -52,16 +57,8 @@ if [ ! -f "${dump_file}" ]; then
   exit 1
 fi
 
-if [ -f "${ENV_FILE}" ]; then
-  # shellcheck disable=SC1090
-  set -a
-  # shellcheck disable=SC1091
-  source <(grep -E '^(POSTGRES_USER|POSTGRES_DB)=' "${ENV_FILE}")
-  set +a
-fi
-
-POSTGRES_USER="${POSTGRES_USER:-infirmo}"
-POSTGRES_DB="${POSTGRES_DB:-infirmo}"
+POSTGRES_USER="$("${compose[@]}" exec -T db printenv POSTGRES_USER | tr -d '\r')"
+POSTGRES_DB="$("${compose[@]}" exec -T db printenv POSTGRES_DB | tr -d '\r')"
 
 if [ "${skip_confirm}" -ne 1 ]; then
   echo "[restore] Cette opération va ÉCRASER le contenu de la base '${POSTGRES_DB}'"
@@ -77,8 +74,8 @@ echo "[restore] Restauration de '${dump_file}' dans la base '${POSTGRES_DB}'..."
 
 # --clean --if-exists : supprime les objets existants avant recréation, sans
 # échouer si un objet du dump n'existe pas encore dans la base cible.
-docker compose -f "${REPO_ROOT}/docker-compose.yml" exec -T db \
-  pg_restore --clean --if-exists -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" \
+"${compose[@]}" exec -T db \
+  pg_restore --exit-on-error --single-transaction --clean --if-exists -U "${POSTGRES_USER}" -d "${POSTGRES_DB}" \
   < "${dump_file}"
 
 echo "[restore] Terminé."

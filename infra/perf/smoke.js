@@ -4,7 +4,7 @@
 // sous une charge légère. Ce n'est PAS un test de charge/capacité : voir
 // infra/perf/README.md pour la trajectoire vers des scénarios plus lourds.
 //
-// COMPLIANCE (AGENTS.md §5) : ne cibler QUE des environnements à données
+// COMPLIANCE (AGENTS.md) : ne cibler QUE des environnements à données
 // SYNTHÉTIQUES (local, staging). Ne jamais lancer de test de charge contre
 // un environnement contenant de vraies données de santé sans autorisation
 // explicite — un afflux de requêtes peut dégrader un service en production

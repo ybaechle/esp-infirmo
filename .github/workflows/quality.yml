@@ -1,0 +1,56 @@
+name: Quality
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  backend:
+    uses: ./.github/workflows/backend-ci.yml
+  ia:
+    uses: ./.github/workflows/ia-ci.yml
+  mobile:
+    uses: ./.github/workflows/mobile-ci.yml
+  cold-start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check operational scripts
+        run: bash infra/test_operations.sh
+      - name: Cold-start executable increment
+        run: |
+          cp .env.example .env
+          start=$(date +%s)
+          trap 'echo "Elapsed seconds: $(($(date +%s) - start)); exit: $?" > onboarding.txt' EXIT
+          docker compose up -d --build --wait --wait-timeout 180
+          python3 infra/check_v01.py
+          echo "Onboarding seconds: $(($(date +%s) - start))" > onboarding.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cold-start
+          path: onboarding.txt
+          if-no-files-found: warn
+      - name: Stop disposable CI stack
+        if: always()
+        run: docker compose down
+  gate:
+    name: Quality gate
+    needs: [backend, ia, mobile, cold-start]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every verification
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python3 - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          failed = [name for name, job in results.items() if job['result'] != 'success']
+          if failed:
+              raise SystemExit('Required verification failed or skipped: ' + ', '.join(failed))
+          print('All required verifications passed.')
+          PY

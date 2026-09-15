@@ -2,7 +2,7 @@
 #
 # Portée : dev local uniquement, avec des données SYNTHÉTIQUES. Ce n'est pas
 # l'environnement HDS (voir la skill hds-hosting) : aucune donnée de santé
-# réelle ne doit transiter ici (AGENTS.md §5).
+# réelle ne doit transiter ici (AGENTS.md).
 #
 # Frontières réseau :
 #   - réseau "default" : backend <-> db, backend <-> redis.
@@ -51,10 +51,14 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-infirmo}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.example)}@db:5432/${POSTGRES_DB:-infirmo}
       REDIS_URL: redis://redis:6379/0
+      INFIRMO_DEMO_MODE: "true"
+      INFIRMO_DEMO_EMAIL: ${INFIRMO_DEMO_EMAIL:-demo@infirmo.example}
+      INFIRMO_DEMO_PASSWORD: ${INFIRMO_DEMO_PASSWORD:-Infirmo-demo-2026!}
+    command: ["sh", "-c", "alembic upgrade head && python -m app.seed_demo && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log"]
     ports:
       # Publié sur BACKEND_PORT (défaut 8000) : modifiable dans .env si le
       # port est déjà pris par un autre projet sur la machine.
-      - "${BACKEND_PORT:-8000}:8000"
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -64,18 +68,32 @@ services:
       - default
       - internal
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=2)"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  mobile:
+    build: ./mobile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ia:
     build: ./ia
     restart: unless-stopped
     # Scaffold DevOps (pas encore Whisper). Volontairement pas de "ports:" :
     # ia ne doit jamais être joignable depuis l'hôte ou l'extérieur, seulement
-    # depuis backend sur le réseau "internal" (AGENTS.md §5, hds-hosting).
+    # depuis backend sur le réseau "internal" (AGENTS.md, hds-hosting).
     networks:
       - internal
     healthcheck:
@@ -89,7 +107,7 @@ services:
   # Désactivé par défaut : démarrer avec
   #   docker compose --profile monitoring up -d
   # Scrape uniquement /metrics du backend (compteurs/latences par route,
-  # jamais de contenu de requête — AGENTS.md §5.6). Voir
+  # jamais de contenu de requête — AGENTS.md). Voir
   # infra/monitoring/README.md.
 
   prometheus:
@@ -123,7 +141,7 @@ services:
       # GRAFANA_ADMIN_PASSWORD n'est pas défini dans .env.
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD doit etre defini dans .env (cf .env.example)}
       # Accès anonyme désactivé explicitement (défaut Grafana, réaffirmé ici
-      # par exigence de durcissement — AGENTS.md §5).
+      # par exigence de durcissement — AGENTS.md).
       GF_AUTH_ANONYMOUS_ENABLED: "false"
     volumes:
       - grafana_data:/var/lib/grafana

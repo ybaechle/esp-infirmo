@@ -1,44 +1,30 @@
-name: IA CI
-
-# INF-11 — lint (ruff) + tests (pytest) du microservice ia/ via uv.
-# Déclenché uniquement quand ia/ (ou ce workflow) change.
+name: Ia CI
 on:
-  pull_request:
-    paths:
-      - "ia/**"
-      - ".github/workflows/ia-ci.yml"
-  push:
-    branches: [develop, main]
-    paths:
-      - "ia/**"
-      - ".github/workflows/ia-ci.yml"
-
+  workflow_call:
 permissions:
   contents: read
-
 defaults:
   run:
     working-directory: ia
-
 jobs:
   lint-test:
-    name: ruff + pytest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: astral-sh/setup-uv@v5
         with:
+          version: "0.11.17"
           enable-cache: true
           cache-dependency-glob: ia/uv.lock
-
-      - name: Installer les dépendances (lockfile)
-        run: uv sync --locked
-
-      - name: Lint (ruff)
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
-
-      - name: Tests (pytest)
-        run: uv run pytest -q
+      - run: uv sync --locked --python 3.12
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -q --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70 --junitxml=test-results.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ia-quality
+          path: |
+            ia/coverage.xml
+            ia/test-results.xml
+          if-no-files-found: warn

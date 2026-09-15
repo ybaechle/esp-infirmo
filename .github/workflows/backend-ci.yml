@@ -1,44 +1,46 @@
 name: Backend CI
-
-# INF-9 — lint (ruff) + tests (pytest) du module backend/ via uv.
-# Déclenché uniquement quand backend/ (ou ce workflow) change.
 on:
-  pull_request:
-    paths:
-      - "backend/**"
-      - ".github/workflows/backend-ci.yml"
-  push:
-    branches: [develop, main]
-    paths:
-      - "backend/**"
-      - ".github/workflows/backend-ci.yml"
-
+  workflow_call:
 permissions:
   contents: read
-
 defaults:
   run:
     working-directory: backend
-
 jobs:
   lint-test:
-    name: ruff + pytest
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_USER: infirmo
+          POSTGRES_PASSWORD: ci-synthetic
+          POSTGRES_DB: infirmo_test
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U infirmo -d infirmo_test" --health-interval 5s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://infirmo:ci-synthetic@localhost:5432/infirmo_test
+      REDIS_URL: redis://localhost:6379/0
     steps:
       - uses: actions/checkout@v4
-
       - uses: astral-sh/setup-uv@v5
         with:
+          version: "0.11.17"
           enable-cache: true
           cache-dependency-glob: backend/uv.lock
-
-      - name: Installer les dépendances (lockfile)
-        run: uv sync --locked
-
-      - name: Lint (ruff)
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
-
-      - name: Tests (pytest)
-        run: uv run pytest -q
+      - run: uv sync --locked --python 3.12
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pytest -q --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70 --junitxml=test-results.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-quality
+          path: |
+            backend/coverage.xml
+            backend/test-results.xml
+          if-no-files-found: warn

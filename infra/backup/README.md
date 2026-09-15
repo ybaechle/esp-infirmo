@@ -46,6 +46,22 @@ bash infra/backup/restore.sh -y infra/backup/dumps/infirmo-infirmo-20260702T1400
 - **Opération destructive** : sauf `-y`, une confirmation explicite
   (`oui`) est demandée avant d'écraser la base.
 
+## Select the target environment
+
+Defaults are the root `docker-compose.yml` and `.env`. The scripts read the
+database identity from the selected running container. For staging, set all paths
+explicitly (Bash):
+
+```sh
+COMPOSE_FILE="$HOME/infirmo/docker-compose.staging.yml" ENV_FILE="$HOME/infirmo/.env" IMAGES_ENV_FILE="$HOME/infirmo/.images.env" bash infra/backup/backup.sh
+COMPOSE_FILE="$HOME/infirmo/docker-compose.staging.yml" ENV_FILE="$HOME/infirmo/.env" IMAGES_ENV_FILE="$HOME/infirmo/.images.env" bash infra/backup/restore.sh path/to/backup.dump
+```
+
+Restore requires confirmation unless `-y`, and fails on its first error within a
+single transaction. Failed backups remain `.partial` and do not enter rotation.
+Rotation includes only completed dumps for the selected database. The historical
+verification below does not validate these changes; repeat the restore test.
+
 ## Sauvegardes de vraies données de santé — activité HDS n°6
 
 **Ces scripts ne doivent JAMAIS être utilisés pour sauvegarder de vraies
@@ -60,7 +76,7 @@ certificat — pas ce script `bash` local.
 
 - l'environnement **local** (`docker-compose.yml`, données synthétiques) ;
 - l'environnement **staging** (`infra/deploy/`, données synthétiques
-  uniquement — voir AGENTS.md §5 et `infra/hds/README.md` §1).
+  uniquement — voir AGENTS.md et `infra/hds/README.md` §1).
 
 ## Test de restauration (vérification effectuée — INF-16)
 

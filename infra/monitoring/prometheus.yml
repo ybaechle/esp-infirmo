@@ -1,9 +1,9 @@
 # Configuration Prometheus — profil "monitoring" (INF-15).
 #
 # Portée : dev local / staging avec données SYNTHÉTIQUES uniquement (voir
-# infra/monitoring/README.md et AGENTS.md §5). Ne scrape que l'endpoint
+# infra/monitoring/README.md et AGENTS.md). Ne scrape que l'endpoint
 # /metrics du backend, qui n'expose que des compteurs/latences par route —
-# jamais de contenu de requête/réponse (AGENTS.md §5.6).
+# jamais de contenu de requête/réponse (AGENTS.md).
 
 global:
   scrape_interval: 15s

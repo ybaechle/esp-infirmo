@@ -1,4 +1,86 @@
-# INFIRMO — T-ESP-800
+# INFIRMO — incrément v0.1 / T9 BUILD
+
+**Parcours livré : connexion avec un compte fictif, modification du profil, sauvegarde PostgreSQL et récupération après reconnexion.** Le service IA reste un squelette de santé; la transcription, l'inscription professionnelle, la 2FA, le matching et les remplacements restent au backlog.
+
+Cette version est réservée aux **données synthétiques**. Elle ne doit recevoir aucun dossier patient ni donnée de professionnel réel. La validation HDS/production n'est pas acquise.
+
+- [État des preuves et résultats](reporting/evidence/verification.md)
+- [Tableau de bord du sprint](reporting/dashboard.md)
+- [Bilan, roadmap et actions](reporting/sprint-1.md)
+- [Décisions d'architecture](docs/adr/README.md)
+
+## Installation à froid v0.1
+
+Prérequis : Git, Docker Desktop démarré avec moteur Linux (ou Docker Engine sous Linux), plugin Compose v2 avec `--wait`, Python 3.12+ pour le contrôle d'acceptation, accès réseau aux registres de dépendances/images et accès en lecture à ce dépôt privé. Le SDK Flutter n'est pas nécessaire pour le parcours Docker. Le premier build télécharge le SDK et les dépendances : inclure ce temps dans la mesure. Vérifier `docker info`, `docker compose version` et `python --version` avant le chronomètre d'exécution; consigner séparément le temps d'installation des prérequis.
+
+Les étapes numérotées suivantes constituent les **7 actions de référence** du protocole. Les commandes internes d'une étape ne sont pas recomptées séparément. Geler le commit et ce document avant toute tentative; consigner tout ajustement non prescrit dans le [Delta Log](reporting/delta-log.csv).
+
+1. **Cloner la branche de livraison**, puis relever la révision. Les commandes fonctionnent dans PowerShell et dans un shell Linux/macOS.
+
+   ```bash
+   git clone --branch feature/t9-executable-reporting --single-branch https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1.git infirmo
+   cd infirmo
+   git rev-parse HEAD
+   ```
+
+2. **Créer la configuration locale**, uniquement dans ce clone neuf.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Les identifiants d'exemple sont fictifs et réservés à cet environnement local. Ne jamais écraser un `.env` existant. Si un port est occupé, configurer `WEB_PORT`/`BACKEND_PORT` dans `.env` et utiliser ce port dans les étapes suivantes; cette option fait partie de la procédure.
+
+3. **Valider la configuration.**
+
+   ```bash
+   docker compose config --quiet
+   ```
+
+   Résultat attendu : code de sortie 0. Ne pas ajouter de clés manuellement pour contourner une erreur : corriger `.env.example` et tracer une nouvelle tentative.
+
+4. **Construire et démarrer** les services. Les migrations et le compte fictif sont initialisés par la procédure versionnée.
+
+   ```bash
+   docker compose up -d --build --wait --wait-timeout 300
+   docker compose ps
+   ```
+
+   Résultat attendu : les services nécessaires démarrent et les contrôles de santé passent. Le compte initial est `demo@infirmo.example`, mot de passe `Infirmo-demo-2026!`. Il est créé uniquement avec le mode de démonstration explicitement activé.
+
+5. **Exécuter le contrôle d'acceptation API.**
+
+   ```bash
+   python infra/check_v01.py --url http://localhost:8080
+   ```
+
+   Résultat attendu : code de sortie 0 après connexion, écriture/relecture persistante et révocation de session. Le contrôle utilise seulement le compte fictif; consulter son `--help` si les paramètres de démonstration ont été personnalisés.
+
+6. **Valider le parcours interface** dans `http://localhost:8080` (ou le `WEB_PORT` configuré) : se connecter, modifier le nom fictif/la ville/le rôle, enregistrer, se déconnecter puis se reconnecter. Vérifier les valeurs sauvegardées. Recharger l'onglet et se reconnecter : la session n'est pas conservée sur l'appareil, le profil reste dans PostgreSQL.
+
+7. **Arrêter et vérifier la conservation des données.**
+
+   ```bash
+   docker compose down
+   docker compose up -d --wait --wait-timeout 300
+   ```
+
+   Refaire la connexion et vérifier le profil, puis `docker compose down`. Ne pas ajouter `--volumes` : cela supprimerait les données de ce projet. Noter fin, durée, résultat, écarts et révision dans [le protocole indépendant](reporting/onboarding.md).
+
+### Tests de développement
+
+Les commandes propres à chaque module sont décrites dans [backend](backend/README.md), [mobile](mobile/README.md) et [IA](ia/README.md). Flutter 3.44.0 est utilisé pour le mobile; le build web distribue la même application pour l'exercice externe. Un build Android nécessite en plus le SDK Android décrit dans le README mobile.
+
+```bash
+python -m unittest discover -s reporting -p "test_*.py"
+python reporting/dashboard.py
+```
+
+Pour une répétition locale isolée, les mêmes commandes Compose peuvent recevoir `--env-file .env.example -p infirmo-t9-check`; changer les ports si une autre instance fonctionne. Cette répétition ne constitue pas la validation par un pair sur machine propre.
+
+---
+
+## Cadrage du projet
 
 **Le réseau professionnel des infirmiers libéraux**
 
@@ -29,7 +111,7 @@ INFIRMO propose une plateforme mobile spécialisée permettant :
 Ce dépôt est le dépôt principal du projet :
 
 ```text
-T-ESP-800-project-100856-NCY_Infirmo
+EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1
 ```
 
 Il sert de mono-repo pour centraliser :
@@ -40,9 +122,9 @@ Il sert de mono-repo pour centraliser :
 - la configuration DevOps ;
 - le suivi technique du projet.
 
-La structure complète sera mise en place progressivement au fur et à mesure du développement.
+La structure est en place. Le périmètre fonctionnel actuel et ses limites sont décrits en tête de ce README.
 
-Structure cible :
+Structure :
 
 ```text
 .
@@ -57,7 +139,7 @@ Structure cible :
 └── infra/
 ```
 
-Les dossiers `mobile/`, `backend/`, `ia/` et `infra/` correspondent aux principaux modules techniques du projet. Ils pourront contenir leur propre documentation lorsque leur développement démarrera.
+Les dossiers `mobile/`, `backend/`, `ia/` et `infra/` contiennent leurs sources et leur documentation technique.
 
 ---
 
@@ -155,7 +237,7 @@ Un ticket peut donc appartenir à un milestone fonctionnel tout en étant trait�
 
 | Sprint | Période | Objectif opérationnel |
 | ------ | ------- | -------------------- |
-| Sprint 1 | 11/09/2026 - 24/09/2026 | Lancement technique : structure du dépôt, conventions, setup mobile/backend/IA, Docker, CI initiale. |
+| Sprint 1 | 11/09/2026 - 24/09/2026 | Socle technique et incrément synthétique connexion/profil persistant; tests, installation indépendante, Delta Log et reporting T9. Voir les limites et gates dans `reporting/sprint-1.md`. |
 | Sprint 2 | 25/09/2026 - 27/11/2026 | Développement MVP Core : authentification, profils, documents, matching, premières intégrations. |
 | Sprint 3 | 30/11/2026 - 22/01/2027 | Remplacements et communication : candidatures, calendrier, messagerie, transmissions, IA. |
 | Sprint 4 | 29/01/2027 - 05/03/2027 | Tests, intégration, sécurité, optimisation et stabilisation de l’application. |

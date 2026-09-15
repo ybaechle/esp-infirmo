@@ -1,0 +1,84 @@
+id,title,owner,baseline_hours,actual_hours,etc_hours,sprint,committed,status,due,updated_at,evidence
+PM-1,Finaliser et maintenir le cahier des charges,Tetiana Lombardi,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+PM-2,Produire les maquettes UI/UX Figma MVP,Tetiana Lombardi,38.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+PM-3,Configurer GitHub Projects et le backlog général,Tetiana Lombardi,14.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+PM-4,Suivi ScrumBan et reporting projet,Tetiana Lombardi,21.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+PM-5,"Plan qualité, risques et Definition of Done",Tetiana Lombardi,14.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+PM-6,Préparer la soutenance finale et les livrables,Tetiana Lombardi,29.4,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-1,Initialisation projet Flutter et intégration Figma,Maxence Noizet,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-2,Écrans d'authentification et création de profils,Maxence Noizet,28.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-3,"Configuration zones, disponibilités et préférences",Maxence Noizet,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-4,"Découverte des offres, carte et filtres",Maxence Noizet,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-5,Calendrier dynamique,Maxence Noizet,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-6,Cycle de vie d'un remplacement côté mobile,Maxence Noizet,24.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-7,"Messagerie, notifications et transmissions côté mobile",Maxence Noizet,18.9,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MOB-8,Interface vocal et transcription IA,Maxence Noizet,10.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-1,Profils infirmiers et cabinets côté backend,Yohan Baechle,21.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-2,Documents légaux et validation upload backend,Yohan Baechle,10.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-3,Publication de tournées côté backend,Yohan Baechle,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-4,Aide fullstack intégration mobile/backend M2-M4,Yohan Baechle,28.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-5,Sécurité auth forte et RBAC,Yohan Baechle,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-6,Support PostgreSQL/PostGIS et requêtes métier,Yohan Baechle,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-7,Tests d'intégration fullstack Auth / Profil / Matching,Yohan Baechle,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-8,Validation performance mobile et API côté intégration,Yohan Baechle,8.4,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+YB-9,Documentation technique fullstack,Yohan Baechle,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-1,Architecture API et conventions REST,Louis Chenot,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-2,"JWT, sessions et refresh tokens",Louis Chenot,10.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-3,Workflow candidature et acceptation,Louis Chenot,17.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-4,Statuts des missions et transitions,Louis Chenot,10.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-5,Messagerie texte/photo sécurisée backend,Louis Chenot,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-6,Transmissions sécurisées patients,Louis Chenot,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-7,WebSocket temps réel,Louis Chenot,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-8,Tests API communication/remplacements,Louis Chenot,15.4,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-9,Documentation OpenAPI backend,Louis Chenot,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-10,Audit logs backend pour accès sensibles,Louis Chenot,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-1,Architecture API partagée et conventions backend,Ziad Tiarimti,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-2,Setup PostgreSQL + PostGIS et migration initiale,Ziad Tiarimti,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-3,Modèles métier remplacements et santé,Ziad Tiarimti,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-4,Inscription et vérification Ordre Infirmiers,Ziad Tiarimti,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-5,2FA optionnelle Email/SMS,Ziad Tiarimti,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-6,Algorithme de matching et filtres avancés,Ziad Tiarimti,17.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-7,Intégration microservice IA dans le backend,Ziad Tiarimti,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-8,Notifications push et APIs externes,Ziad Tiarimti,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-9,Chiffrement et conformité RGPD backend,Ziad Tiarimti,17.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-10,Tests backend intégration services,Ziad Tiarimti,11.9,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+ZT-11,Passation API et documentation intégration,Ziad Tiarimti,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-01,Architecture et choix des modèles IA,Pierre-Arthur Toutouom Yountebo,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-02,Initialisation microservice FastAPI IA,Pierre-Arthur Toutouom Yountebo,3.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-03,Dockerfile et requirements IA,Pierre-Arthur Toutouom Yountebo,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-04,Intégration modèle Whisper,Pierre-Arthur Toutouom Yountebo,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-05,Endpoint POST /api/v1/transcribe,Pierre-Arthur Toutouom Yountebo,10.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-06,Optimisation performances transcription,Pierre-Arthur Toutouom Yountebo,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-07,Pipeline RAG avec contexte patient,Pierre-Arthur Toutouom Yountebo,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-08,Prompt engineering domaine médical,Pierre-Arthur Toutouom Yountebo,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-09,Endpoint POST /api/v1/extract,Pierre-Arthur Toutouom Yountebo,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-10,Formatage et validation sortie Pydantic,Pierre-Arthur Toutouom Yountebo,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-11,Gestion erreurs et logging IA,Pierre-Arthur Toutouom Yountebo,3.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-12,Optimisation latence et quantification,Pierre-Arthur Toutouom Yountebo,5.6,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-13,Batching et charge concurrente,Pierre-Arthur Toutouom Yountebo,11.9,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+IA-14,Documentation OpenAPI et README IA,Pierre-Arthur Toutouom Yountebo,4.9,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-1,Organisation GitHub et dépôts,Lazaro Marrero Rousse,3.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-2,Protection branches main/develop,Lazaro Marrero Rousse,3.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-3,CONTRIBUTING et conventions Git,Lazaro Marrero Rousse,4.9,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-4,Commitlint et conventional commits,Lazaro Marrero Rousse,3.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-5,git-cz commits guidés,Lazaro Marrero Rousse,2.1,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-6,semantic-release minimal,Lazaro Marrero Rousse,3.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-7,Templates issues et PR avec DoD,Lazaro Marrero Rousse,3.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-8,Docker Compose local,Lazaro Marrero Rousse,14.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-9,CI Backend GitHub Actions,Lazaro Marrero Rousse,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-10,CI Mobile Flutter GitHub Actions,Lazaro Marrero Rousse,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-11,CI Microservice IA GitHub Actions,Lazaro Marrero Rousse,5.6,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-12,Staging et POC HDS,Lazaro Marrero Rousse,14.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-13,Déploiement automatique staging,Lazaro Marrero Rousse,10.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-14,Déploiement production et rollback,Lazaro Marrero Rousse,10.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-15,Monitoring Prometheus/Grafana,Lazaro Marrero Rousse,14.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-16,Backups PostgreSQL et restauration,Lazaro Marrero Rousse,10.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-17,Tests performance Locust/k6,Lazaro Marrero Rousse,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+INF-18,README infra et documentation DevOps,Lazaro Marrero Rousse,13.3,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-TL,Réunions projet et coordination,Tetiana Lombardi,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-MN,Réunions projet et coordination,Maxence Noizet,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-YB,Réunions projet et coordination,Yohan Baechle,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-LC,Réunions projet et coordination,Louis Chenot,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-ZT,Réunions projet et coordination,Ziad Tiarimti,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-PAT,Réunions projet et coordination,Pierre-Arthur Toutouom Yountebo,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-LMR,Réunions projet et coordination,Lazaro Marrero Rousse,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported

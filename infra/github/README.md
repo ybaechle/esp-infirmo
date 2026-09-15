@@ -9,7 +9,7 @@ des branches).
 | Élément | Valeur |
 | ------- | ------ |
 | Organisation | `EpitechMscProPromo2027` |
-| Dépôt | `T-ESP-800-project-100856-NCY_Infirmo` |
+| Dépôt | `T-ESP-901-NCY-9-1-T-ESP-901-1` |
 | Visibilité | Privé |
 | Branche par défaut | `main` |
 | Suivi du backlog | GitHub Projects (champs `Sprint`, `Priority`, `Epic`, `WBS_Code`…) |
@@ -48,7 +48,7 @@ puis importer chaque fichier JSON de `rulesets/`.
 Via l'API :
 
 ```bash
-REPO=EpitechMscProPromo2027/T-ESP-800-project-100856-NCY_Infirmo
+REPO=EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1
 gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch-main.json
 gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch-develop.json
 ```
@@ -67,33 +67,25 @@ gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch
   au format `<module>-vX.Y.Z` (`backend/.releaserc.json`, etc. — les
   `package.json` de module sont des manifestes de release, pas du code).
 
-## Intégration continue (INF-9 → INF-11)
+## Quality checks
 
-| Workflow | Fichier | Déclencheur | Contenu |
-| -------- | ------- | ----------- | ------- |
-| Commitlint | `commitlint.yml` | toute PR | commits + titre de PR conventionnels |
-| Backend CI | `backend-ci.yml` | changements `backend/**` | `ruff check` + `ruff format --check` + `pytest` (uv, lockfile) |
-| IA CI | `ia-ci.yml` | changements `ia/**` | idem backend |
-| Mobile CI | `mobile-ci.yml` | changements `mobile/**` | `dart format` + `flutter analyze` + `flutter test` (no-op vert tant que l'app Flutter n'est pas initialisée) |
-| Release | `release.yml` | push `main` | semantic-release par module |
+`quality.yml` runs on all PRs and all `develop`/`main` pushes. Reusable workflows
+validate backend, IA and mobile. The cold-start job builds the complete Compose
+stack and runs `infra/check_v01.py`. The stable **Quality gate** requires all four
+results to be `success`, including when a dependency fails or is skipped.
 
-Les CI de module sont filtrées par chemin : elles ne tournent que quand le
-module change (plus leur propre fichier de workflow).
+Backend/IA: Ruff, pytest, coverage >=70%, XML/JUnit reports. Mobile: formatting,
+analysis, tests with LCOV and web build. Report figures with SHA and date in
+`/reporting/`. Missing Actions budget is an execution blocker, not a test result.
 
-### Évolutions prévues
+The versioned rulesets require `Quality gate`. An administrator must still apply
+them using the commands above and verify active remote rules. JSON files alone
+do not protect branches. Update existing rulesets by ID rather than duplicating.
+These quality checks have no path filters that could leave PRs pending.
 
-- Ajouter les **status checks requis** (CI backend / mobile / IA / commitlint)
-  dans les rulesets une fois les noms de checks stabilisés — voir
-  `.github/workflows/`. Ne pas exiger un check filtré par chemin : une PR qui ne
-  déclenche pas le workflow resterait bloquée.
+## Deployment
 
-## Déploiement (INF-12 → INF-14)
-
-| Workflow | Fichier | Déclencheur | Contenu |
-| -------- | ------- | ----------- | ------- |
-| Deploy Staging | `deploy-staging.yml` | push `develop` (chemins `backend/**`, `ia/**`, `infra/deploy/**`) ou `workflow_dispatch` ; PR sur le workflow → build de validation seul | Build + push GHCR (`backend`, `ia`) puis déploiement SSH sur le serveur staging |
-| Deploy Production | `deploy-production.yml` | push d'un tag `backend-v*` / `ia-v*` (semantic-release), ou `workflow_dispatch` (déploiement manuel / rollback) | Build + push GHCR (sur tag uniquement) puis déploiement SSH sur le serveur de production |
-
-Détail (architecture, secrets à configurer, procédure de rollback) :
-[`infra/deploy/README.md`](../deploy/README.md). Rappel hébergement de
-données de santé : [`infra/hds/README.md`](../hds/README.md).
+Staging follows a successful Quality push run on `develop`. Release validates the
+quality suite on `main`, then explicitly dispatches each new module tag to Deploy
+Production. See [deployment](../deploy/README.md) for secrets, persisted versions,
+readiness, acceptance and rollback.
