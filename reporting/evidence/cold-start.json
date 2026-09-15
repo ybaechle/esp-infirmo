@@ -1,0 +1,543 @@
+{
+  "run_id": "cold-dind-bf55fcd-20260915",
+  "source_commit": "bf55fcd2dae591c1f8134aa989a388ce5f1ab7de",
+  "readme_worktree_sha256": "e7c53cc42a563c39f5f3d3c061b55f54d2b2126f999414e569388e5815d3dd87",
+  "result": "Functional cold-cache technical reproduction passed with two retained verifier adjustments",
+  "verifier": "automated technical verification in an isolated daemon; not a human external peer",
+  "external_human_peer_validation": false,
+  "environment": {
+    "verifier": "automated technical verification in an isolated daemon; not a human external peer",
+    "source_commit": "bf55fcd2dae591c1f8134aa989a388ce5f1ab7de",
+    "readme_worktree_sha256": "e7c53cc42a563c39f5f3d3c061b55f54d2b2126f999414e569388e5815d3dd87",
+    "source": "fresh remote single-branch clone",
+    "host": "Windows; Docker Desktop Linux engine29.5.3; Python3.13.6; Compose5.1.4; prerequisites already installed",
+    "isolated_daemon": "docker:29-dind; Docker29.8.0; Compose5.5.1; no host Docker socket or source mounts",
+    "initial_cache": "0 images, 0 containers, 0 local volumes, 0 build cache",
+    "task_container_id": "4fd75b082846032d08dcff5776af6fcb8bc9305d4fabd9a27a9529e1d56ca6d5",
+    "ports": {
+      "web": 18080,
+      "backend": 18000
+    },
+    "environment_changes": "Only README-prescribed .env copy and WEB_PORT/BACKEND_PORT overrides",
+    "timing_scope": "actions.jsonl records individual command duration; overall wall time also includes separately named prerequisite harness preparation and verifier pauses",
+    "limitations": "Fresh application runtime/cache/volumes on an existing host, not a freshly installed OS; DinD overhead affects durations"
+  },
+  "cold_cache_proof": {
+    "images": 0,
+    "containers": 0,
+    "volumes": 0,
+    "build_cache_bytes": 0,
+    "log": "prerequisite-empty-daemon.log"
+  },
+  "builds": [
+    {
+      "module": "backend",
+      "status": "Completed",
+      "duration_seconds": 363,
+      "cached_percent": 0,
+      "steps": "16/16",
+      "record": "aiu5usdnjar4jyq4pxyu6tv8s"
+    },
+    {
+      "module": "ia",
+      "status": "Completed",
+      "duration_seconds": 283,
+      "cached_percent": 0,
+      "steps": "14/14",
+      "record": "rqgkp4qiz6xrc3xnlaf0ruc22"
+    },
+    {
+      "module": "mobile",
+      "status": "Completed",
+      "duration_seconds": 1106,
+      "cached_percent": 0,
+      "steps": "15/15",
+      "record": "5wpzs0mz1d2pzhpr8ys6fc4jn"
+    }
+  ],
+  "timing": {
+    "first_clone_started_utc": "2026-09-15T14:02:21.402402+00:00",
+    "final_down_finished_utc": "2026-09-15T14:33:29.796491+00:00",
+    "overall_observation_window_seconds": 1868.394,
+    "first_compose_started_utc_from_log_creation": "2026-09-15T14:05:03.828868+00:00",
+    "all_healthy_observed_utc": "2026-09-15T14:25:12.656741+00:00",
+    "first_start_to_healthy_observation_seconds": 1208.828,
+    "original_compose_exit_code": null,
+    "limitation": "Observation windows include interleaved harness setup, shared-host/DinD overhead, and verifier pauses. Original Compose completion time and exit code were lost to recorder failure; these are not independent clean-hardware or human onboarding benchmarks."
+  },
+  "pdr": {
+    "baseline": "README7 numbered application actions at frozen revision",
+    "adjustments_during_application_execution": 2,
+    "denominator": 7,
+    "percent": 28.57,
+    "scope": "Application-procedure execution including verifier corrections; excludes upfront Docker-in-Docker, socat forwarding, source-copy and recorder setup. Not a whole-environment PDR.",
+    "corrections": [
+      "UTF-8 configuration in Windows recorder after paperclip UnicodeEncodeError",
+      "Focused keyboard.insertText separated from submit after Flutter controller was not populated by fast Playwright fill"
+    ]
+  },
+  "outcomes": {
+    "five_services_healthy": true,
+    "api_acceptance_exit_code": 0,
+    "browser": {
+      "action": "06-browser-flow",
+      "verifier": "root agent via real Chrome 152, actual screenshot viewport 929x861",
+      "started_utc": "2026-09-15T14:26:32+00:00",
+      "finished_utc": "2026-09-15T14:29:24+00:00",
+      "elapsed_seconds": 172,
+      "result": "PASS: login, edit name/city/role, save, reload clears session, login preserves profile, logout/login preserves profile; final logout",
+      "profile": {
+        "display_name": "Camille Test Isolé",
+        "role": "titulaire",
+        "city": "Metz"
+      },
+      "instrumentation_failure": "Fast Playwright fill after logout did not populate Flutter controller; response wait timed out with empty-password validation and no API request",
+      "adjustment": "Focused keyboard.insertText separated from submit; passed",
+      "evidence": "E:/Users/Moonie/Documents/School/Academic/Projects/Infirmo/reporting/evidence/cold-browser-profile.png",
+      "unprescribed_adjustments": 1,
+      "viewport_correction": "The initial reported360x800 was reset by navigation; screenshot confirms929x861. Cached-stack checks used smaller viewports."
+    },
+    "restart_fresh_login_profile_digest": "72a5b5d27e726e875431837e255e4aa4bc9bed655d2184f9015a83e14dbdf8d6",
+    "restart_verification_exit_code": 0,
+    "original_synthetic_profile_restored": true,
+    "final_compose_down_exit_code": 0,
+    "volumes_deleted_during_baseline": false
+  },
+  "upfront_harness_commands": [
+    "git/docker/python executable inventory; docker info; docker compose version; python --version; disk and running-container inventory",
+    "docker run --detach --privileged --name infirmo-t9-cold-bf55fcd --env DOCKER_TLS_CERTDIR= --publish 127.0.0.1:18080:18080 --publish 127.0.0.1:18000:18000 docker:29-dind",
+    "docker exec infirmo-t9-cold-bf55fcd apk add --no-cache socat",
+    "docker cp . infirmo-t9-cold-bf55fcd:/work",
+    "docker exec --detach infirmo-t9-cold-bf55fcd socat TCP-LISTEN:18080,bind=172.17.0.2,fork,reuseaddr TCP:127.0.0.1:18080",
+    "docker exec --detach infirmo-t9-cold-bf55fcd socat TCP-LISTEN:18000,bind=172.17.0.2,fork,reuseaddr TCP:127.0.0.1:18000",
+    "Verifier run_action.py records subprocess output, timestamps and exit status; no application changes"
+  ],
+  "actions": [
+    {
+      "action": "01-clone",
+      "cwd": "E:/Users/Moonie/Documents/School/Academic/Projects/infirmo-cold-bf55fcd",
+      "command": [
+        "git",
+        "clone",
+        "--branch",
+        "feature/t9-executable-reporting",
+        "--single-branch",
+        "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1.git",
+        "infirmo"
+      ],
+      "started_utc": "2026-09-15T14:02:21.402402+00:00",
+      "finished_utc": "2026-09-15T14:02:26.027717+00:00",
+      "elapsed_seconds": 4.625,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\01-clone.log"
+    },
+    {
+      "action": "prerequisite-dind",
+      "cwd": "E:/Users/Moonie/Documents/School/Academic/Projects/infirmo-cold-bf55fcd",
+      "command": [
+        "docker",
+        "run",
+        "--detach",
+        "--privileged",
+        "--name",
+        "infirmo-t9-cold-bf55fcd",
+        "--env",
+        "DOCKER_TLS_CERTDIR=",
+        "--publish",
+        "127.0.0.1:18080:18080",
+        "--publish",
+        "127.0.0.1:18000:18000",
+        "docker:29-dind"
+      ],
+      "started_utc": "2026-09-15T14:02:32.410199+00:00",
+      "finished_utc": "2026-09-15T14:03:27.404181+00:00",
+      "elapsed_seconds": 54.994,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\prerequisite-dind.log"
+    },
+    {
+      "action": "02-config",
+      "cwd": ".",
+      "command": [
+        "python",
+        "-c",
+        "from pathlib import Path; p=Path('.env'); assert not p.exists(); p.write_text(Path('.env.example').read_text().replace('WEB_PORT=8080','WEB_PORT=18080')+'\\nBACKEND_PORT=18000\\n'); print('Copied fresh .env; documented port overrides WEB_PORT=18080 BACKEND_PORT=18000')"
+      ],
+      "started_utc": "2026-09-15T14:03:33.009568+00:00",
+      "finished_utc": "2026-09-15T14:03:33.222220+00:00",
+      "elapsed_seconds": 0.213,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\02-config.log"
+    },
+    {
+      "action": "prerequisite-empty-daemon",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "sh",
+        "-c",
+        "docker info --format \"{{.ServerVersion}}\" && docker compose version && docker image ls && docker volume ls && docker system df"
+      ],
+      "started_utc": "2026-09-15T14:04:10.021849+00:00",
+      "finished_utc": "2026-09-15T14:04:10.440280+00:00",
+      "elapsed_seconds": 0.418,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\prerequisite-empty-daemon.log"
+    },
+    {
+      "action": "prerequisite-forwarding",
+      "cwd": "E:/Users/Moonie/Documents/School/Academic/Projects/infirmo-cold-bf55fcd",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "apk",
+        "add",
+        "--no-cache",
+        "socat"
+      ],
+      "started_utc": "2026-09-15T14:04:25.606282+00:00",
+      "finished_utc": "2026-09-15T14:04:29.891454+00:00",
+      "elapsed_seconds": 4.285,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\prerequisite-forwarding.log"
+    },
+    {
+      "action": "prerequisite-copy-clone",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "cp",
+        ".",
+        "infirmo-t9-cold-bf55fcd:/work"
+      ],
+      "started_utc": "2026-09-15T14:04:47.779250+00:00",
+      "finished_utc": "2026-09-15T14:04:49.343797+00:00",
+      "elapsed_seconds": 1.565,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\prerequisite-copy-clone.log"
+    },
+    {
+      "action": "03-compose-config",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "--workdir",
+        "/work",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "compose",
+        "config",
+        "--quiet"
+      ],
+      "started_utc": "2026-09-15T14:04:49.499080+00:00",
+      "finished_utc": "2026-09-15T14:04:49.865670+00:00",
+      "elapsed_seconds": 0.367,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\03-compose-config.log"
+    },
+    {
+      "action": "04-observed-status",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "--workdir",
+        "/work",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "compose",
+        "ps"
+      ],
+      "started_utc": "2026-09-15T14:25:12.380318+00:00",
+      "finished_utc": "2026-09-15T14:25:12.656741+00:00",
+      "elapsed_seconds": 0.276,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\04-observed-status.log"
+    },
+    {
+      "action": "recovered-build-history",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "buildx",
+        "history",
+        "ls"
+      ],
+      "started_utc": "2026-09-15T14:25:12.768563+00:00",
+      "finished_utc": "2026-09-15T14:25:13.048750+00:00",
+      "elapsed_seconds": 0.28,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\recovered-build-history.log"
+    },
+    {
+      "action": "recovered-mobile-build",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "buildx",
+        "history",
+        "logs",
+        "5wpzs0mz1d2pzhpr8ys6fc4jn"
+      ],
+      "started_utc": "2026-09-15T14:25:38.940325+00:00",
+      "finished_utc": "2026-09-15T14:25:39.188754+00:00",
+      "elapsed_seconds": 0.248,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\recovered-mobile-build.log"
+    },
+    {
+      "action": "05-api-acceptance",
+      "cwd": ".",
+      "command": [
+        "python",
+        "infra/check_v01.py",
+        "--url",
+        "http://localhost:18080"
+      ],
+      "started_utc": "2026-09-15T14:25:28.259166+00:00",
+      "finished_utc": "2026-09-15T14:25:49.593073+00:00",
+      "elapsed_seconds": 21.334,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\05-api-acceptance.log"
+    },
+    {
+      "action": "04-first-build-metadata",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "5wpzs0mz1d2pzhpr8ys6fc4jn"
+      ],
+      "started_utc": "2026-09-15T14:26:29.962077+00:00",
+      "finished_utc": "2026-09-15T14:26:30.373605+00:00",
+      "elapsed_seconds": 0.412,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\04-first-build-metadata.log"
+    },
+    {
+      "action": "final-source-proof",
+      "cwd": ".",
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "started_utc": "2026-09-15T14:26:30.542414+00:00",
+      "finished_utc": "2026-09-15T14:26:31.503609+00:00",
+      "elapsed_seconds": 0.961,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\final-source-proof.log"
+    },
+    {
+      "action": "04-first-build-start-wrapper-failed",
+      "started_utc_from_log_creation": "2026-09-15T14:05:03.828868+00:00",
+      "last_captured_output_utc": "2026-09-15T14:20:44.517828+00:00",
+      "wrapper_exit_code": 1,
+      "compose_exit_code": null,
+      "error": "UnicodeEncodeError: 'charmap' codec can't encode character '\\U0001f4ce' in position 10: character maps to <undefined>",
+      "adjustment": "Configured verifier stdout UTF-8 with replacement; application source and original Docker build unchanged",
+      "result": "Recovered Docker BuildKit successful records; subsequently observed all five services healthy and acceptance passed",
+      "unprescribed_adjustments": 1,
+      "pdr_denominator_baseline_actions": 7,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\04-first-build-start.log"
+    },
+    {
+      "action": "recovered-backend-build",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "aiu5usdnjar4jyq4pxyu6tv8s"
+      ],
+      "started_utc": "2026-09-15T14:27:33.590652+00:00",
+      "finished_utc": "2026-09-15T14:27:41.999701+00:00",
+      "elapsed_seconds": 8.409,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\recovered-backend-build.log"
+    },
+    {
+      "action": "recovered-ia-build",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "buildx",
+        "history",
+        "inspect",
+        "rqgkp4qiz6xrc3xnlaf0ruc22"
+      ],
+      "started_utc": "2026-09-15T14:27:43.392728+00:00",
+      "finished_utc": "2026-09-15T14:27:44.636334+00:00",
+      "elapsed_seconds": 1.244,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\recovered-ia-build.log"
+    },
+    {
+      "action": "cold-resource-footprint",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "system",
+        "df"
+      ],
+      "started_utc": "2026-09-15T14:27:44.778334+00:00",
+      "finished_utc": "2026-09-15T14:27:46.909048+00:00",
+      "elapsed_seconds": 2.131,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\cold-resource-footprint.log"
+    },
+    {
+      "action": "06-browser-flow",
+      "verifier": "root agent via real Chrome 152, actual screenshot viewport 929x861",
+      "started_utc": "2026-09-15T14:26:32+00:00",
+      "finished_utc": "2026-09-15T14:29:24+00:00",
+      "elapsed_seconds": 172,
+      "result": "PASS: login, edit name/city/role, save, reload clears session, login preserves profile, logout/login preserves profile; final logout",
+      "profile": {
+        "display_name": "Camille Test Isolé",
+        "role": "titulaire",
+        "city": "Metz"
+      },
+      "instrumentation_failure": "Fast Playwright fill after logout did not populate Flutter controller; response wait timed out with empty-password validation and no API request",
+      "adjustment": "Focused keyboard.insertText separated from submit; passed",
+      "evidence": "E:/Users/Moonie/Documents/School/Academic/Projects/Infirmo/reporting/evidence/cold-browser-profile.png",
+      "unprescribed_adjustments": 1,
+      "viewport_correction": "The initial reported360x800 was reset by navigation; screenshot confirms929x861. Cached-stack checks used smaller viewports."
+    },
+    {
+      "action": "07-profile-before-restart",
+      "cwd": ".",
+      "command": [
+        "python",
+        "../check_restart.py",
+        "capture"
+      ],
+      "started_utc": "2026-09-15T14:30:04.420746+00:00",
+      "finished_utc": "2026-09-15T14:30:13.488761+00:00",
+      "elapsed_seconds": 9.068,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\07-profile-before-restart.log"
+    },
+    {
+      "action": "07-down",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "--workdir",
+        "/work",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "compose",
+        "down"
+      ],
+      "started_utc": "2026-09-15T14:30:13.670847+00:00",
+      "finished_utc": "2026-09-15T14:30:52.296823+00:00",
+      "elapsed_seconds": 38.626,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\07-down.log"
+    },
+    {
+      "action": "07-up",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "--workdir",
+        "/work",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "compose",
+        "up",
+        "-d",
+        "--wait",
+        "--wait-timeout",
+        "300"
+      ],
+      "started_utc": "2026-09-15T14:30:53.055658+00:00",
+      "finished_utc": "2026-09-15T14:31:20.103334+00:00",
+      "elapsed_seconds": 27.048,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\07-up.log"
+    },
+    {
+      "action": "07-verify-persistence",
+      "cwd": ".",
+      "command": [
+        "python",
+        "../check_restart.py",
+        "verify"
+      ],
+      "started_utc": "2026-09-15T14:32:53.608268+00:00",
+      "finished_utc": "2026-09-15T14:33:02.075304+00:00",
+      "elapsed_seconds": 8.467,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\07-verify-persistence.log"
+    },
+    {
+      "action": "cleanup-restore-profile",
+      "cwd": ".",
+      "command": [
+        "python",
+        "../check_restart.py",
+        "restore"
+      ],
+      "started_utc": "2026-09-15T14:33:02.314291+00:00",
+      "finished_utc": "2026-09-15T14:33:13.689126+00:00",
+      "elapsed_seconds": 11.375,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\cleanup-restore-profile.log"
+    },
+    {
+      "action": "07-final-down",
+      "cwd": ".",
+      "command": [
+        "docker",
+        "exec",
+        "--workdir",
+        "/work",
+        "infirmo-t9-cold-bf55fcd",
+        "docker",
+        "compose",
+        "down"
+      ],
+      "started_utc": "2026-09-15T14:33:13.806050+00:00",
+      "finished_utc": "2026-09-15T14:33:29.796491+00:00",
+      "elapsed_seconds": 15.99,
+      "exit_code": 0,
+      "log": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\07-final-down.log"
+    }
+  ],
+  "raw_evidence": {
+    "directory": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd",
+    "archive": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\infirmo-cold-bf55fcd\\cold-start-raw-bf55fcd.zip",
+    "sha256": "9d3b8881a3d3eed5e07e74cacb868f47e09d6ee7681de0f9befcec19c5d2a9ec",
+    "contents": "Logs, JSON records and frozen README only; excludes clone, .env and scripts. The README contains only public synthetic demo credentials."
+  },
+  "regression": "Subsequent cached regression at88a5abb is separate and does not change this frozen cold-run result"
+}

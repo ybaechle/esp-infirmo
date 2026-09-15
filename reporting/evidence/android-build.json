@@ -1,0 +1,53 @@
+{
+  "source_commit": "88a5abb3991d35b731cb4b57ccee3f10e271c346",
+  "source_main_sha256": "9640456c445356c9705940c2b3b84475a3f028a3ffadc59862aa2de287ec933c",
+  "source_snapshot": "Isolated copy of the mobile working tree; main.dart includes the errorMaxLines=3 correction and matches the current source.",
+  "excluded": [
+    "build",
+    ".dart_tool",
+    "android/local.properties",
+    "Gradle caches",
+    "IDE files"
+  ],
+  "builder": "ghcr.io/cirruslabs/flutter:3.44.0@sha256:46691e311715845de03a3ba4753a475476936805b29431b1f00f1816981033f8",
+  "flutter": "3.44.0 (559ffa3f75e7402d65a8def9c28389a9b2e6fe42)",
+  "dart": "3.12.0",
+  "java": "OpenJDK 21.0.9+10-Ubuntu-124.04",
+  "android_sdk": {
+    "build_tools": "36.0.0",
+    "platform": "android-36",
+    "ndk": "28.2.13676358",
+    "cmake": "3.22.1",
+    "path": "/opt/android-sdk-linux"
+  },
+  "gradle": "9.1.0",
+  "android_gradle_plugin": "9.0.1",
+  "kotlin_plugin": "2.3.20",
+  "command": "flutter build apk --debug --dart-define=API_BASE_URL=http://10.0.2.2:8080/api",
+  "container_command": "docker build --progress plain --file C:\\Users\\lazar\\AppData\\Local\\Temp\\infirmo-android-20260915-161226\\Dockerfile.android --output type=local,dest=C:\\Users\\lazar\\AppData\\Local\\Temp\\infirmo-android-20260915-161226\\artifact C:\\Users\\lazar\\AppData\\Local\\Temp\\infirmo-android-20260915-161226",
+  "started_at": "2026-09-15T14:26:08.8851738Z",
+  "finished_at": "2026-09-15T14:42:41.5460072Z",
+  "elapsed_seconds": 992.6608334,
+  "gradle_assemble_seconds": 944.0,
+  "exit_code": 0,
+  "output": "Built build/app/outputs/flutter-apk/app-debug.apk",
+  "artifact_path": "E:\\Users\\Moonie\\Documents\\School\\Academic\\Projects\\Infirmo-artifacts\\88a5abb\\app-debug.apk",
+  "artifact_bytes": 148406941,
+  "artifact_sha256": "234aac1a9e3a0df88748e34c73184b5525f0e8aa6aa873387108a47dd65fe7bc",
+  "durable_copy_sha256_verified": true,
+  "resource_limits": {
+    "gradle_workers": 2,
+    "gradle_metaspace_mib": 512,
+    "gradle_heap_mib": 1536,
+    "scope": "Gradle build settings only; not a whole-container memory limit."
+  },
+  "observations": [
+    "Flutter image layers were already cached in BuildKit.",
+    "First Android build downloaded Gradle dependencies, NDK and CMake inside isolated Docker layers using existing image licenses.",
+    "Host Android SDK was not installed or changed.",
+    "Debug manifest permits synthetic HTTP; main/release manifest does not enable cleartext.",
+    "No APK installation, emulator execution, device interaction or native user journey was performed.",
+    "Debug signing only; artifact is outside Git and is not a store release.",
+    "The host Android command previously failed because its SDK was absent; this container build is a separate successful validation."
+  ]
+}

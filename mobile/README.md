@@ -55,6 +55,39 @@ Les commandes Android nécessitent un SDK installé et ne sont pas validées sur
 machine sans celui-ci. Sur appareil physique, utiliser une URL de proxy accessible
 à cet appareil ; le Compose par défaut reste limité à localhost.
 
+### Compiler un APK debug sans SDK Android sur l'hôte
+
+Depuis la racine du dépôt, sous PowerShell, ces commandes archivent la révision
+**committée** dans un dossier temporaire puis construisent avec Flutter 3.44.0.
+Les caches et `local.properties` de l'hôte ne sont pas repris. Docker doit être
+disponible en mode Linux; le premier build télécharge notamment Gradle et le NDK.
+
+```powershell
+$work = Join-Path $env:TEMP ('infirmo-apk-' + [guid]::NewGuid().ToString())
+New-Item -ItemType Directory -Path $work | Out-Null
+git archive --format=tar --output="$work/source.tar" HEAD mobile
+tar -xf "$work/source.tar" -C "$work"
+@'
+FROM ghcr.io/cirruslabs/flutter:3.44.0 AS build
+WORKDIR /app
+COPY mobile/ .
+RUN flutter pub get --enforce-lockfile
+RUN sed -i 's/^org.gradle.jvmargs=.*/org.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m/' android/gradle.properties && printf '\norg.gradle.workers.max=2\n' >> android/gradle.properties
+RUN flutter build apk --debug --dart-define=API_BASE_URL=http://10.0.2.2:8080/api
+FROM scratch AS artifact
+COPY --from=build /app/build/app/outputs/flutter-apk/app-debug.apk /app-debug.apk
+'@ | Set-Content -Encoding utf8 "$work/Dockerfile.android"
+docker build --file "$work/Dockerfile.android" --output "type=local,dest=$work/artifact" "$work"
+Get-FileHash "$work/artifact/app-debug.apk" -Algorithm SHA256
+```
+
+Le réglage mémoire/ouvriers ne modifie que la copie de compilation. L'APK utilise
+le proxy Compose de l'hôte via `10.0.2.2:8080`, adresse propre à l'émulateur Android.
+Le HTTP reste autorisé uniquement en debug pour les données fictives. Cette
+compilation a réussi; elle ne prouve pas l'installation ni le parcours sur un
+appareil/émulateur. Versions, durée et empreinte :
+[`android-build.json`](../reporting/evidence/android-build.json). Ne pas committer l'APK.
+
 ## Périmètre
 
 Authentification d'un compte de démonstration et profil professionnel uniquement.

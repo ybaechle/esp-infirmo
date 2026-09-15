@@ -1,0 +1,26 @@
+{
+  "checked_at": "2026-09-15T14:44:46.288209+00:00",
+  "repository": "EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1",
+  "role": "student",
+  "attempts": [
+    {
+      "branch": "main",
+      "command": [
+        "gh",
+        "api",
+        "repos/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/rulesets",
+        "--method",
+        "POST",
+        "--input",
+        "infra/github/rulesets/branch-main.json"
+      ],
+      "exit_code": 1,
+      "response": {
+        "message": "Not Found",
+        "documentation_url": "https://docs.github.com/rest/repos/rules#create-a-repository-ruleset",
+        "status": "404"
+      },
+      "stderr": "gh: Not Found (HTTP 404)"
+    }
+  ]
+}

@@ -14,8 +14,12 @@ A synthetic user signs in to the Flutter app, edits a professional profile, save
 - [x] Governance setup: authoritative DoD, issue/PR evidence fields, populated ADRs, baseline effort, Delta Log, reproducible dashboard and cold-start procedure.
 - [x] Local verification: fresh remote clone with empty project volume, real API and live-widget persistence, container recreation, local quality reports and cross-module review. See [observed results](evidence/verification.md).
 - [x] Repository hygiene: preserve project rules in neutral guidance, remove vendor-specific tooling/history credits as requested, preserve human authors, back up refs before rewrite and verify rewritten history.
-- [ ] Browser/device interaction and Android build with the required SDK.
-- [ ] Independent clean-machine onboarding with complete action counts and elapsed time.
+- [x] Real Chrome browser journey: login, validation, save, logout/relogin and reload persistence.
+- [x] Isolated technical reproduction with zero initial application/build caches, measured action counts, retained recorder failure, API/browser/restart verification.
+- [x] Android debug APK built in an isolated SDK container; artifact checksum verified outside Git.
+- [x] Browser regression at 360 px after the narrow-message correction; full error visible, no console errors.
+- [ ] Native device/emulator execution.
+- [ ] Acceptance by an external human peer on a clean machine.
 - [ ] Hosted CI, administrator branch protections, staging deployment and human PR acceptance.
 - [ ] Team-supplied actual hours/ETC, sprint commitment and real retrospective.
 

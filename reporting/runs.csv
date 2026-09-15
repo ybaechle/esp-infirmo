@@ -2,3 +2,4 @@ run_id,date,kind,baseline_revision,procedure,prescribed_actions,unprescribed_act
 developer-compose-1,2026-09-15,developer rehearsal,9924664,README.md steps 1-7,,,,failed_mobile_health,developer tooling; no independent tester,evidence/verification.md
 developer-clone-1,2026-09-15,developer fresh clone,67baa8e,README.md steps 1-7,,,,failed_database_startup,developer tooling; no independent tester,evidence/verification.md
 developer-clone-2,2026-09-15,developer clone through startup only,6789507,README.md steps 1-7,,,1.2141248333333332,startup_passed_protocol_partial,developer tooling; no independent tester,evidence/verification.md; evidence/developer-rehearsal.json
+cold-dind-bf55fcd-20260915,2026-09-15,isolated technical reproduction; observation window,bf55fcd2dae591c1f8134aa989a388ce5f1ab7de,README.md steps1-7; prerequisite harness excluded,7,2,31.1399,functional_pass_recording_failure_retained,automated technical verification; no human peer,evidence/cold-start.md

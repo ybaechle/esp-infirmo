@@ -1,0 +1,53 @@
+{
+  "tested_at": "2026-09-15T14:19:12.159182+00:00",
+  "source_commit": "67895074d4c8541ea59bde8bd6d283e874fd4ea4",
+  "browser": "Chrome 152.0.0.0 on Windows through Playwright",
+  "viewport_tests": [
+    [
+      390,
+      844
+    ],
+    [
+      360,
+      800
+    ]
+  ],
+  "synthetic_data_only": true,
+  "checks": {
+    "login": "pass",
+    "empty_password_validation": "pass, visual truncation found separately",
+    "incorrect_password": "pass: HTTP401 with safe French error",
+    "edit_name_city_role": "pass",
+    "save": "pass: HTTP200",
+    "logout_login_persistence": "pass",
+    "reload_clears_session": "pass",
+    "login_after_reload_preserves_profile": "pass",
+    "restore_original_profile_and_logout": "pass"
+  },
+  "network": "All application assets requested from local origin returned200; expected401 for invalid-password test; other API responses200/204",
+  "console": "One expected failed-resource401 for the negative login test; no other reported browser errors",
+  "automation_notes": [
+    "Flutter accessibility placeholder enabled by dispatching its click event for semantic locators.",
+    "An initial expected-error locator used the wrong text and timed out; inspected actual message and verified it.",
+    "A combined reload/fill attempt did not enter the password before submit; focused field and verified nonempty input before successful repeat. These are automation harness adjustments, not inferred application failures."
+  ],
+  "screenshots": [
+    "browser-login.png",
+    "browser-profile.png",
+    "browser-validation-fixed.png"
+  ],
+  "resolved_defect": {
+    "id": "DL-015",
+    "source_commit": "88a5abb3991d35b731cb4b57ccee3f10e271c346",
+    "checked_at": "2026-09-15T14:47:48Z",
+    "viewport": [
+      360,
+      800
+    ],
+    "result": "Full password validation message wraps on two visible lines; console reports0errors; screenshot inspected",
+    "screenshot": "browser-validation-fixed.png",
+    "build_exit_code": 0,
+    "build_and_start_seconds": 162.429,
+    "automation_note": "Initial text locator also matched ARIA live announcement; narrowed to the observed visible span and passed."
+  }
+}

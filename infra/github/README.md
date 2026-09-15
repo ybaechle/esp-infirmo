@@ -114,8 +114,14 @@ Ce script ne crée ni ne modifie aucune règle, permission ou référence Git. I
 teste pas les exceptions de contournement ni les méthodes de fusion; il ne prouve
 pas le rejet d'une écriture. Un `git push --dry-run` n'est pas une preuve de
 l'application des protections. En cas d'absence confirmée, seul un administrateur
-peut appliquer/corriger les rulesets ci-dessus; relancer ensuite le contrôle avec
+ou un rôle explicitement autorisé à gérer les règles peut appliquer/corriger les rulesets ci-dessus; relancer ensuite le contrôle avec
 le même compte, sans demander de nouveaux droits.
+
+Le 15/09/2026, le rôle distant `student` a également été testé avec une demande
+d'application du ruleset `main` versionné : GitHub a répondu `HTTP 404: Not Found`.
+Aucune règle n'a été créée. La [réponse conservée](../../reporting/evidence/branch-protection-apply.json)
+confirme que l'application n'est pas disponible avec cet accès; elle ne distingue
+pas à elle seule une restriction de permission d'une restriction de plateforme.
 
 ## Deployment
 

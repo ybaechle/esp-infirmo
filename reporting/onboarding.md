@@ -1,6 +1,8 @@
 # Installation à froid : protocole et preuve
 
-**Validation indépendante : non réalisée.** Une vérification locale par l'auteur de la procédure ne remplace pas l'exécution par un pair.
+**Reproduction technique avec caches vides : réussie avec deux écarts tracés. Validation par un pair humain extérieur : non attestée.** Voir les [résultats, mesures et limites](evidence/cold-start.md).
+
+Une vérification technique isolée et une validation par un pair humain sont deux preuves distinctes. Le banc Docker isolé peut vérifier l'absence de caches/dépendances locales et mesurer les étapes; il ne signe pas une attestation à la place d'un pair. Conserver son résultat dans `runs.csv` avec son type de test explicite.
 
 Responsable de coordination : Yohan Baechlé. Date cible : 22 septembre 2026; reprise corrigée avant le 24 septembre. Le nom du testeur sera renseigné après son accord et son exécution.
 

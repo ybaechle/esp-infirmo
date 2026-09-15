@@ -52,6 +52,7 @@ Les estimations initiales sont celles des tickets complets du cadrage. Les cellu
 - developer-compose-1 (developer rehearsal, failed_mobile_health) : PDR Non mesuré; durée Non mesuré. Preuve : evidence/verification.md.
 - developer-clone-1 (developer fresh clone, failed_database_startup) : PDR Non mesuré; durée Non mesuré. Preuve : evidence/verification.md.
 - developer-clone-2 (developer clone through startup only, startup_passed_protocol_partial) : PDR Non mesuré; durée 1.21 min. Preuve : evidence/verification.md; evidence/developer-rehearsal.json.
+- cold-dind-bf55fcd-20260915 (isolated technical reproduction; observation window, functional_pass_recording_failure_retained) : PDR 28.57 %; durée 31.14 min. Preuve : evidence/cold-start.md.
 
 ## Intégration continue
 
