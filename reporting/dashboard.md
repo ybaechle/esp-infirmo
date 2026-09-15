@@ -4,6 +4,8 @@ Généré par `python reporting/dashboard.py`; ne pas modifier à la main.
 
 ## Charge et avancement
 
+- Budget initial du projet complet : 1029.00 h pour 83 tickets.
+- Allocations individuelles et réserve : [tables horaires du PDF](evidence/workload-baseline.md). Ces heures sont planifiées, pas consommées.
 - Charge engagée confirmée du sprint : Non mesuré.
 - Vélocité acceptée selon la DoD : Non mesuré.
 - Réalisation de l'engagement : Non mesuré.

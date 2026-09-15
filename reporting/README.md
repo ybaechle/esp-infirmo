@@ -5,6 +5,7 @@ Période : **11 au 24 septembre 2026**. Responsable de consolidation : **Tetiana
 ## Documents
 
 - [Tableau de bord calculé](dashboard.md) : généré à partir des fichiers de mesures.
+- [Budget source du PDF](evidence/workload-baseline.md) : 147 h planifiees par personne, reserve et limites des allocations de sprint.
 - [Effort](effort.csv) : estimations du cadrage, heures réelles et reste à faire.
 - [Delta Log](delta-log.csv) : écarts observés, corrections et résultats de reprise.
 - [Exécutions](runs.csv) : dénominateur et ajustements de chaque procédure mesurée.
@@ -39,4 +40,6 @@ Période : **11 au 24 septembre 2026**. Responsable de consolidation : **Tetiana
 - **Couverture** : pourcentage mesuré avec périmètre, commande et commit; cible backend ≥ 70 %. La couverture du squelette IA ne démontre aucune transcription.
 - **Réunions** : durée réelle × nombre de participants / 60 = heures-personnes. Conserver décisions et coût, pas seulement présence.
 
-Les estimations du cadrage portent sur des tickets complets. Ne pas les présenter comme une allocation de sprint validée ni comme une mesure d'effort de cette livraison. Les heures humaines et l'ETC attendent les déclarations des responsables; les dates des actions sont des échéances de suivi, pas des promesses d'acceptation par des personnes absentes.
+Les estimations du cadrage portent sur des tickets complets. Ne pas les présenter comme une allocation de sprint validée ni comme une mesure d'effort de cette livraison. Les heures reelles et l'ETC attendent les declarations des responsables; les dates des actions sont des échéances de suivi, pas des promesses d'acceptation par des personnes absentes.
+
+Le cahier des charges fournit deja les heures planifiees : 21 JH = 147 h par personne, 1029 h equipe, plus 220.5 h de reserve equipe. La [preuve de charge](evidence/workload-baseline.md) distingue les budgets du PDF, les dates de sprint du depot, les arrondis de reunion et le temps reel encore inconnu.

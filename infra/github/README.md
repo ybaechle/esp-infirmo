@@ -83,6 +83,40 @@ them using the commands above and verify active remote rules. JSON files alone
 do not protect branches. Update existing rulesets by ID rather than duplicating.
 These quality checks have no path filters that could leave PRs pending.
 
+### Vérification technique en lecture seule
+
+Depuis la racine, avec Python 3.12+ et l'authentification `gh` existante :
+
+```sh
+python -m unittest discover -s infra/github -p "test_*.py"
+python infra/github/check_protections.py --output reporting/evidence/branch-protection.json
+```
+
+Le contrôle interroge les branches exactes `main` et `develop`, leurs SHA et les
+permissions du compte. L'endpoint GitHub des [règles applicables à une branche](https://docs.github.com/en/rest/repos/rules#get-rules-for-a-branch)
+renvoie uniquement les règles **actives et applicables**, y compris celles de
+l'organisation. Une règle inactive ou destinée à une autre branche ne suffit pas.
+La protection classique est lue si nécessaire; les exigences peuvent être
+cumulées entre les deux mécanismes.
+
+Comparaison avec les JSON versionnés : PR obligatoire, au moins une approbation,
+révocation des approbations périmées, résolution des discussions, interdiction du
+force-push et de la suppression, contrôle `Quality gate` obligatoire avec branche
+à jour. La preuve contient l'heure UTC, les SHA des branches, les empreintes des
+fichiers attendus et les contrôles absents.
+
+- Sortie **0** : exigences contrôlées présentes dans la configuration lisible.
+- Sortie **1** : exigences vérifiées absentes.
+- Sortie **2** : état inconnu (API inaccessible, permissions de lecture insuffisantes
+  ou réponse inexploitable). Un 404 ambigu n'est pas une absence prouvée.
+
+Ce script ne crée ni ne modifie aucune règle, permission ou référence Git. Il ne
+teste pas les exceptions de contournement ni les méthodes de fusion; il ne prouve
+pas le rejet d'une écriture. Un `git push --dry-run` n'est pas une preuve de
+l'application des protections. En cas d'absence confirmée, seul un administrateur
+peut appliquer/corriger les rulesets ci-dessus; relancer ensuite le contrôle avec
+le même compte, sans demander de nouveaux droits.
+
 ## Deployment
 
 Staging follows a successful Quality push run on `develop`. Release validates the

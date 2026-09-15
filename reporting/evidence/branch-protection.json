@@ -1,0 +1,99 @@
+{
+  "collected_at": "2026-09-15T14:09:07.640756+00:00",
+  "branches": [
+    {
+      "branch": "main",
+      "expected": {
+        "pull_request": true,
+        "approving_reviews": 1,
+        "dismiss_stale_reviews": true,
+        "resolve_threads": true,
+        "block_force_push": true,
+        "block_deletion": true,
+        "strict_status_checks": true,
+        "required_contexts": [
+          "Quality gate"
+        ]
+      },
+      "status": "missing",
+      "sha": "da13c35752e242318228ba994c0561113bfcbb68",
+      "protected": false,
+      "legacy_status_contexts": [],
+      "effective_rules": [],
+      "legacy_read": "absent: protected=false",
+      "observed": {
+        "pull_request": false,
+        "approving_reviews": 0,
+        "dismiss_stale_reviews": false,
+        "resolve_threads": false,
+        "block_force_push": false,
+        "block_deletion": false,
+        "strict_status_checks": false,
+        "required_contexts": []
+      },
+      "missing": [
+        "pull_request (required True, found False)",
+        "approving_reviews (required 1, found 0)",
+        "dismiss_stale_reviews (required True, found False)",
+        "resolve_threads (required True, found False)",
+        "block_force_push (required True, found False)",
+        "block_deletion (required True, found False)",
+        "strict_status_checks (required True, found False)",
+        "required check: Quality gate"
+      ],
+      "policy_sha256": "aae96e309e34a1967bf233066cabc90cc3c2e9c19cb0badb7fb3c9ffa8ff0e4d"
+    },
+    {
+      "branch": "develop",
+      "expected": {
+        "pull_request": true,
+        "approving_reviews": 1,
+        "dismiss_stale_reviews": true,
+        "resolve_threads": true,
+        "block_force_push": true,
+        "block_deletion": true,
+        "strict_status_checks": true,
+        "required_contexts": [
+          "Quality gate"
+        ]
+      },
+      "status": "missing",
+      "sha": "47862ed5088aab115743e5ebffdcbd84327921cd",
+      "protected": false,
+      "legacy_status_contexts": [],
+      "effective_rules": [],
+      "legacy_read": "absent: protected=false",
+      "observed": {
+        "pull_request": false,
+        "approving_reviews": 0,
+        "dismiss_stale_reviews": false,
+        "resolve_threads": false,
+        "block_force_push": false,
+        "block_deletion": false,
+        "strict_status_checks": false,
+        "required_contexts": []
+      },
+      "missing": [
+        "pull_request (required True, found False)",
+        "approving_reviews (required 1, found 0)",
+        "dismiss_stale_reviews (required True, found False)",
+        "resolve_threads (required True, found False)",
+        "block_force_push (required True, found False)",
+        "block_deletion (required True, found False)",
+        "strict_status_checks (required True, found False)",
+        "required check: Quality gate"
+      ],
+      "policy_sha256": "0486e0f4ce303d26d229178c5ee4aff7dde5b9a0213224a70fdea5ec22762b51"
+    }
+  ],
+  "scope": "Read-only configuration audit; no push, deletion, merge or bypass-actor test.",
+  "repository": "EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1",
+  "permissions": {
+    "admin": false,
+    "maintain": false,
+    "push": true,
+    "triage": true,
+    "pull": true
+  },
+  "exit_code": 1
+}

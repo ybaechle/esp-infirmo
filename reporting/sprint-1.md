@@ -13,8 +13,9 @@ Restent hors incrément : inscription de professionnels réels, vérification de
 ## Données disponibles
 
 - [83 estimations du cadrage](effort.csv), total contrôlé **147 JH = 1029 h**, hors réserve avril de 31,5 JH. Elles concernent le projet complet, pas l'engagement de ce sprint.
+- [Budget individuel et capacite sources](evidence/workload-baseline.md) : **147 h planifiees par personne**, dont 137.9 h productives et 9.1 h de reunions arrondies; reserve distincte de 31.5 h par personne. Le PDF fournit donc les heures prevues, sans mesurer leur consommation.
 - [KPI calculés](dashboard.md), [Delta Log](delta-log.csv), [preuves de vérification](evidence/verification.md).
-- Les heures humaines, ETC et engagements de sprint n'ont pas été fournis. Ils restent inconnus. Ne pas répartir la durée d'exécution des outils entre les membres.
+- Les heures reelles consommees, ETC et engagements de sprint n'ont pas été fournis. Ils restent inconnus. Ne pas répartir la durée d'exécution des outils entre les membres.
 - Au constat initial, seuls deux contributeurs humains sont visibles sous plusieurs identités dans l'historique importé. Les commits squashés ne mesurent pas l'effort réel; la répartition doit être corroborée par tickets, revues, conception et essais.
 - Le dépôt courant n'a ni issues, ni PRs, ni milestones lors du constat. L'ancien GitHub Project n'a pas été inspecté faute de scope `read:project`. Il faut retrouver le suivi existant avant de recréer ou déplacer des tickets.
 
@@ -36,6 +37,7 @@ Les responsables suivent les rôles du cadrage. Ces échéances sont inscrites a
 
 | Action | Responsable unique | Échéance (Europe/Paris) | Critère de fermeture |
 | --- | --- | --- | --- |
+| Rapprocher la capacite des cinq sprints avec le budget PDF et confirmer M6 mars/avril | Tetiana Lombardi | 16/09/2026 18:00 | Allocation de jours/tickets par sprint, reserve distincte et decision de roadmap sourcees |
 | Retrouver le Project et relier le backlog courant | Tetiana Lombardi | 16/09/2026 18:00 | URL accessible, tickets/WBS, responsables et engagement du sprint vérifiés |
 | Fournir les heures réelles et ETC de chaque tâche active | Tetiana Lombardi, consolidation | 16/09/2026 18:00 puis chaque jour projet | Déclarations des sept responsables; tableau recalculé |
 | Faire débloquer le budget Actions et appliquer les rulesets | Lazaro Marrero Rousse | 17/09/2026 18:00 | Administrateur identifié; contrôles exécutés; relecture API des deux protections |

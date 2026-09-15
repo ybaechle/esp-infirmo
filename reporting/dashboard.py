@@ -97,8 +97,11 @@ def read_csv(name):
 
 def render():
     rows, planned, delivered = effort_metrics(read_csv("effort.csv"))
+    baseline = sum(row["baseline"] for row in rows) if all(row["baseline"] is not None for row in rows) else None
     lines = ["# Tableau de bord - sprint 1", "", "Généré par `python reporting/dashboard.py`; ne pas modifier à la main.", "",
              "## Charge et avancement", "",
+             f"- Budget initial du projet complet : {display(baseline, ' h')} pour {len(rows)} tickets.",
+             "- Allocations individuelles et réserve : [tables horaires du PDF](evidence/workload-baseline.md). Ces heures sont planifiées, pas consommées.",
              f"- Charge engagée confirmée du sprint : {display(planned, ' h')}.",
              f"- Vélocité acceptée selon la DoD : {display(delivered, ' h')}.",
              f"- Réalisation de l'engagement : {display(percentage(delivered, planned), ' %')}.",
