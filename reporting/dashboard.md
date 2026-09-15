@@ -47,11 +47,13 @@ Les estimations initiales sont celles des tickets complets du cadrage. Les cellu
 
 ## Dérive et onboarding
 
-PDR et durée d'installation : **non mesurés**. Aucun protocole complet chronométré enregistré.
+- developer-compose-1 (developer rehearsal, failed_mobile_health) : PDR Non mesuré; durée Non mesuré. Preuve : evidence/verification.md.
+- developer-clone-1 (developer fresh clone, failed_database_startup) : PDR Non mesuré; durée Non mesuré. Preuve : evidence/verification.md.
+- developer-clone-2 (developer clone through startup only, startup_passed_protocol_partial) : PDR Non mesuré; durée 1.21 min. Preuve : evidence/verification.md; evidence/developer-rehearsal.json.
 
 ## Intégration continue
 
-Instantané : 2026-09-15T13:32:26.655978+00:00; `EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1`, branche `develop`, latest 100 runs (or fewer if unavailable).
+Instantané : 2026-09-15T13:47:15.263140+00:00; `EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1`, branche `develop`, latest 100 runs (or fewer if unavailable).
 
 - Succès : 0/7; taux global 0.00 %.
 - Échecs exécutés : 0; blocages d'infrastructure : 7.

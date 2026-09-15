@@ -8,12 +8,16 @@ A synthetic user signs in to the Flutter app, edits a professional profile, save
 
 ## Work and verification
 
-- [ ] Backend: SQLAlchemy models, Alembic migration, explicitly enabled synthetic seed, expiring and revocable bearer sessions, validated profile ownership; pytest with coverage and PostgreSQL acceptance.
-- [ ] Mobile: French Flutter sign-in/profile screens, memory-only session, input/error/loading states; widget/client tests, analysis and web build.
-- [ ] Infrastructure: documented Docker startup, same-origin web/API routing, migrations, real acceptance checks, honest CI/deployment gates, backup/rollback corrections.
-- [ ] Governance: authoritative DoD, issue/PR evidence fields, populated ADRs, baseline effort, Delta Log, reproducible dashboard and cold-start procedure.
-- [ ] Verification: isolated Compose project, actual login/profile persistence, clean rebuild/restart, local quality reports, whole-change review.
-- [ ] Repository hygiene: preserve project rules in neutral guidance, remove vendor-specific tooling/history credits as requested, preserve human authors, back up refs before rewrite and verify every rewritten ref.
+- [x] Backend: SQLAlchemy models, Alembic migration, explicitly enabled synthetic seed, expiring and revocable bearer sessions, validated profile ownership; pytest with coverage and PostgreSQL acceptance.
+- [x] Mobile: French Flutter sign-in/profile screens, memory-only session, input/error/loading states; widget/client tests, analysis and web build.
+- [x] Infrastructure implementation: documented Docker startup, same-origin web/API routing, migrations, real acceptance checks, honest CI/deployment gates, backup/rollback corrections.
+- [x] Governance setup: authoritative DoD, issue/PR evidence fields, populated ADRs, baseline effort, Delta Log, reproducible dashboard and cold-start procedure.
+- [x] Local verification: fresh remote clone with empty project volume, real API and live-widget persistence, container recreation, local quality reports and cross-module review. See [observed results](evidence/verification.md).
+- [x] Repository hygiene: preserve project rules in neutral guidance, remove vendor-specific tooling/history credits as requested, preserve human authors, back up refs before rewrite and verify rewritten history.
+- [ ] Browser/device interaction and Android build with the required SDK.
+- [ ] Independent clean-machine onboarding with complete action counts and elapsed time.
+- [ ] Hosted CI, administrator branch protections, staging deployment and human PR acceptance.
+- [ ] Team-supplied actual hours/ETC, sprint commitment and real retrospective.
 
 ## Integration contract
 

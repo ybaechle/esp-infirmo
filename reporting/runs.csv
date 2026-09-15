@@ -1,1 +1,4 @@
 run_id,date,kind,baseline_revision,procedure,prescribed_actions,unprescribed_actions,duration_minutes,result,tester,evidence
+developer-compose-1,2026-09-15,developer rehearsal,9924664,README.md steps 1-7,,,,failed_mobile_health,developer tooling; no independent tester,evidence/verification.md
+developer-clone-1,2026-09-15,developer fresh clone,67baa8e,README.md steps 1-7,,,,failed_database_startup,developer tooling; no independent tester,evidence/verification.md
+developer-clone-2,2026-09-15,developer clone through startup only,6789507,README.md steps 1-7,,,1.2141248333333332,startup_passed_protocol_partial,developer tooling; no independent tester,evidence/verification.md; evidence/developer-rehearsal.json

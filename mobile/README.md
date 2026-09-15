@@ -65,3 +65,21 @@ cette première interface fonctionnelle ne revendique pas leur reproduction.
 Les tests utilisent un serveur HTTP simulé pour vérifier le contrat, l'édition,
 la reconnexion après fermeture, la validation, les erreurs et la déconnexion.
 La persistance réelle se vérifie avec le parcours Docker et les tests backend.
+
+### Parcours des widgets avec l'API réelle
+
+Après démarrage du Compose local, depuis `mobile/` :
+
+```sh
+flutter test test_live/profile_live_test.dart --dart-define=LIVE_API_BASE_URL=http://localhost:8080/api
+```
+
+Ce test explicite utilise le compte fictif par défaut et de vraies requêtes HTTP
+via le proxy : connexion depuis les widgets, édition/enregistrement, déconnexion,
+recréation de l'application et reconnexion avec relecture du profil. Il restaure
+ensuite le profil initial. Exécuter ce test et `infra/check_v01.py` successivement :
+ils partagent le compte fictif. Ne pas modifier ce compte simultanément pendant le test.
+Une URL absente ou une API indisponible fait échouer le test, sans le sauter.
+Le dossier `test_live/` est exclu du parcours `flutter test` standard. Ce rendu
+dans le banc de test Flutter ne remplace pas un essai dans le navigateur ou sur
+appareil ni l'installation indépendante par un pair.

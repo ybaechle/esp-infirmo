@@ -54,7 +54,7 @@ Les étapes numérotées suivantes constituent les **7 actions de référence** 
    python infra/check_v01.py --url http://localhost:8080
    ```
 
-   Résultat attendu : code de sortie 0 après connexion, écriture/relecture persistante et révocation de session. Le contrôle utilise seulement le compte fictif; consulter son `--help` si les paramètres de démonstration ont été personnalisés.
+   Résultat attendu : code de sortie 0 après connexion, écriture/relecture persistante et révocation de session. Le contrôle utilise seulement le compte fictif. Attendre sa fin avant de modifier ce compte dans l'interface ou de lancer le test de widgets avec API réelle : ces contrôles partagent le même profil. Les variables `INFIRMO_DEMO_EMAIL` et `INFIRMO_DEMO_PASSWORD` permettent de reprendre les identifiants de démonstration personnalisés.
 
 6. **Valider le parcours interface** dans `http://localhost:8080` (ou le `WEB_PORT` configuré) : se connecter, modifier le nom fictif/la ville/le rôle, enregistrer, se déconnecter puis se reconnecter. Vérifier les valeurs sauvegardées. Recharger l'onglet et se reconnecter : la session n'est pas conservée sur l'appareil, le profil reste dans PostgreSQL.
 
