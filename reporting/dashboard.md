@@ -9,7 +9,7 @@ Généré par `python reporting/dashboard.py`; ne pas modifier à la main.
 - Charge engagée confirmée du sprint : Non mesuré.
 - Vélocité acceptée selon la DoD : Non mesuré.
 - Réalisation de l'engagement : Non mesuré.
-- Tickets avec heures réelles déclarées : 0/83.
+- Tickets avec heures réelles déclarées : 19/83.
 - Tickets avec ETC déclaré : 0/83.
 
 Les estimations initiales sont celles des tickets complets du cadrage. Les cellules inconnues ne valent pas zéro.
@@ -28,24 +28,24 @@ Les estimations initiales sont celles des tickets complets du cadrage. Les cellu
 | ZT-2 | Ziad Tiarimti | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 | IA-02 | Pierre-Arthur Toutouom Yountebo | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 | IA-03 | Pierre-Arthur Toutouom Yountebo | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-1 | Lazaro Marrero Rousse | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-2 | Lazaro Marrero Rousse | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-3 | Lazaro Marrero Rousse | 4.90 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-4 | Lazaro Marrero Rousse | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-5 | Lazaro Marrero Rousse | 2.10 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-6 | Lazaro Marrero Rousse | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-7 | Lazaro Marrero Rousse | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-8 | Lazaro Marrero Rousse | 14.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-9 | Lazaro Marrero Rousse | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-10 | Lazaro Marrero Rousse | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-11 | Lazaro Marrero Rousse | 5.60 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-12 | Lazaro Marrero Rousse | 14.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-13 | Lazaro Marrero Rousse | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-14 | Lazaro Marrero Rousse | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-15 | Lazaro Marrero Rousse | 14.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-16 | Lazaro Marrero Rousse | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-17 | Lazaro Marrero Rousse | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| INF-18 | Lazaro Marrero Rousse | 13.30 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-1 | Lazaro Marrero Rousse | 3.50 | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-2 | Lazaro Marrero Rousse | 3.50 | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-3 | Lazaro Marrero Rousse | 4.90 | 4.90 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-4 | Lazaro Marrero Rousse | 3.50 | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-5 | Lazaro Marrero Rousse | 2.10 | 2.10 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-6 | Lazaro Marrero Rousse | 3.50 | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-7 | Lazaro Marrero Rousse | 3.50 | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-8 | Lazaro Marrero Rousse | 14.00 | 14.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-9 | Lazaro Marrero Rousse | 7.00 | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-10 | Lazaro Marrero Rousse | 7.00 | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-11 | Lazaro Marrero Rousse | 5.60 | 5.60 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-12 | Lazaro Marrero Rousse | 14.00 | 14.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-13 | Lazaro Marrero Rousse | 10.50 | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-14 | Lazaro Marrero Rousse | 10.50 | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-15 | Lazaro Marrero Rousse | 14.00 | 14.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-16 | Lazaro Marrero Rousse | 10.50 | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-17 | Lazaro Marrero Rousse | 7.00 | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| INF-18 | Lazaro Marrero Rousse | 13.30 | 13.30 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 
 ## Dérive et onboarding
 
