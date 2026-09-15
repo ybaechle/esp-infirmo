@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -82,6 +83,10 @@ void main() {
   );
 
   testWidgets('validates login and shows safe API error', (tester) async {
+    tester.view.physicalSize = const Size(360, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     var requests = 0;
     final api = InfirmoApi(
       client: MockClient((request) async {
@@ -100,6 +105,14 @@ void main() {
     expect(
       find.text('Saisissez un mot de passe (128 caractères maximum).'),
       findsOneWidget,
+    );
+    expect(
+      tester
+          .renderObject<RenderParagraph>(
+            find.text('Saisissez un mot de passe (128 caractères maximum).'),
+          )
+          .didExceedMaxLines,
+      isFalse,
     );
     await tester.enterText(find.byKey(const Key('password')), 'incorrect');
     await tester.ensureVisible(find.text('Se connecter'));

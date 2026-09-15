@@ -20,6 +20,7 @@ class InfirmoApp extends StatelessWidget {
       scaffoldBackgroundColor: const Color(0xfff5f8f7),
       inputDecorationTheme: const InputDecorationTheme(
         border: OutlineInputBorder(),
+        errorMaxLines: 3,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
