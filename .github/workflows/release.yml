@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   issues: write
   pull-requests: write
@@ -15,7 +16,10 @@ permissions:
 concurrency: release
 
 jobs:
+  quality:
+    uses: ./.github/workflows/quality.yml
   release:
+    needs: quality
     runs-on: ubuntu-latest
     strategy:
       # séquentiel : évite les courses sur les tags/releases
@@ -34,8 +38,21 @@ jobs:
 
       - run: npm ci
 
+      - name: Tags before release
+        run: git tag -l '${{ matrix.module }}-v*' > /tmp/tags-before
       - name: semantic-release ${{ matrix.module }}
         working-directory: ${{ matrix.module }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
+
+      - name: Explicit production handoff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MODULE: ${{ matrix.module }}
+        run: |
+          git tag -l "$MODULE-v*" > /tmp/tags-after
+          new_tag=$(comm -13 <(sort /tmp/tags-before) <(sort /tmp/tags-after))
+          if [ -n "$new_tag" ]; then
+            gh workflow run deploy-production.yml --ref main -f module="$MODULE" -f version="${new_tag#"$MODULE"-}" -F build=true
+          fi

@@ -1,21 +1,15 @@
-# infirmo-backend
-#
-# Scaffold DevOps minimal (INF-8 — Docker Compose local). Ce pyproject.toml
-# fournit juste assez de code (health checks) pour valider l'orchestration
-# Docker Compose. L'équipe backend (Louis/Ziad, INF-2+) remplacera ce
-# scaffold par l'application FastAPI réelle (routes, SQLAlchemy/Alembic,
-# domaine métier).
-
 [project]
 name = "infirmo-backend"
 version = "0.1.0"
-description = "API HTTP Infirmo (FastAPI) — scaffold DevOps, à remplacer par l'équipe backend"
+description = "API Infirmo — parcours de démonstration synthétique T9"
 requires-python = ">=3.12"
 dependencies = [
+    "alembic~=1.18.4",
     "fastapi~=0.139.0",
     "prometheus-fastapi-instrumentator~=8.0.2",
     "psycopg[binary]~=3.3.4",
     "redis~=8.0.1",
+    "sqlalchemy~=2.0.48",
     "uvicorn[standard]~=0.49.0",
 ]
 
@@ -23,6 +17,7 @@ dependencies = [
 dev = [
     "httpx~=0.28.1",
     "pytest~=9.1.1",
+    "pytest-cov~=7.0.0",
     "ruff~=0.15.20",
 ]
 
@@ -30,3 +25,5 @@ dev = [
 # Rend `app` importable depuis tests/ sans installer le paquet (pas de
 # build-system : ce scaffold n'est pas destiné à être packagé/publié).
 pythonpath = ["."]
+addopts = "--cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=70"
+markers = ["postgres: integration requiring TEST_DATABASE_URL and a disposable PostgreSQL database"]

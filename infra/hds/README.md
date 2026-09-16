@@ -4,7 +4,7 @@ Ce document répond au ticket INF-12 (« POC HDS ») : il explique pourquoi
 l'hébergement actuel n'est **pas** un hébergement de données de santé (HDS),
 ce que la loi exige, et la cible recommandée pour quand INFIRMO manipulera de
 vraies données de santé (patients, transmissions, voix). Il complète la skill
-`hds-hosting` et AGENTS.md §5, qui restent la référence normative.
+`hds-hosting` et AGENTS.md, qui restent la référence normative.
 
 ---
 
@@ -23,12 +23,12 @@ personnel recueillies à l'occasion d'activités de prévention, de diagnostic,
 de soin ou de suivi médico-social. **Aucune donnée de santé réelle** (profils
 infirmiers réels, transmissions liées à un patient, enregistrements vocaux
 réels) ne doit transiter par ce serveur, y compris temporairement, y compris
-en test. Voir AGENTS.md §5.1-5.3 et la skill `hds-hosting`.
+en test. Voir AGENTS.md-5.3 et la skill `hds-hosting`.
 
 En pratique :
 
 - Fixtures de test, seeds de démo, comptes de démonstration : générés
-  synthétiquement (voir AGENTS.md §5.10).
+  synthétiquement (voir AGENTS.md).
 - `docker-compose.staging.yml` est structurellement identique à ce qui sera
   déployé plus tard sur un hébergeur certifié (voir §4) — seul le contenu de
   `.env` et l'hébergeur changent au moment de la bascule.
@@ -134,7 +134,7 @@ qu'une seule donnée de santé réelle ne transite) :
 du 2026-07-02) :
 
 6. **Chiffrement au repos du volume PostgreSQL live** (pas seulement des
-   backups) : aucune donnée de santé en clair au repos (AGENTS.md §5.7,
+   backups) : aucune donnée de santé en clair au repos (AGENTS.md,
    skill `secure-coding-sante`) — chiffrement disque/volume côté hébergeur
    ou LUKS sur la VM, à valider avant toute donnée réelle.
 7. **Épingler la clé d'hôte SSH** des serveurs de déploiement via un secret
@@ -154,12 +154,12 @@ données réelles y transitent :
 - **`db`** — PostgreSQL/PostGIS (profils, transmissions, données de matching).
 - **`backend`** — API FastAPI (traite les données en transit et vers `db`).
 - **`ia`** — microservice Whisper self-hosted (les enregistrements vocaux
-  sont des données de santé par défaut, voir AGENTS.md §5.1 et §5.9 — pas
+  sont des données de santé par défaut, voir AGENTS.md — pas
   d'envoi à une API IA externe sans DPA + dispositif compatible HDS).
 - **Sauvegardes** — de `db` et de tout stockage objet, chiffrées, dans le
   même périmètre EEE/HDS (activité 6).
 - **Logs** — de tous les services ci-dessus, avec la même contrainte de
-  résidence ; rappel AGENTS.md §5.6 : jamais de donnée de santé ni de secret
+  résidence ; rappel AGENTS.md : jamais de donnée de santé ni de secret
   dans les logs/métriques/traces, HDS ou non.
 
 ---

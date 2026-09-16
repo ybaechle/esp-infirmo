@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-15",
+  "source_commit": "67895074d4c8541ea59bde8bd6d283e874fd4ea4",
+  "kind": "developer rehearsal, fresh remote clone and empty project volume; existing host and base-image caches",
+  "clone_started_at": "2026-09-15T13:35:24.170910+00:00",
+  "compose_completed_at": "2026-09-15T13:36:37.018400+00:00",
+  "clone_through_startup_seconds": 72.847,
+  "duration_boundary": "Remote clone/configuration/build/startup only; excludes API, interface checks and restart; not independent onboarding duration",
+  "compose_start_exit_code": 0,
+  "services": [
+    {
+      "Service": "backend",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "db",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "ia",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "mobile",
+      "State": "running",
+      "Health": "healthy"
+    },
+    {
+      "Service": "redis",
+      "State": "running",
+      "Health": "healthy"
+    }
+  ],
+  "api_acceptance_serial": "PASS: unauthorized access, login, profile update, persistence, logout revocation",
+  "flutter_live_serial": "00:05 +1: All tests passed!",
+  "restart_acceptance": "PASS: edited profile survived docker compose down/up; original snapshot restored",
+  "browser": "not performed: browser control unavailable",
+  "independent_test": "not performed",
+  "pdr": "not measured: complete adjustment counting was not established before these development attempts"
+}

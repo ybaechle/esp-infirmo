@@ -2,7 +2,7 @@
 #
 # Portée : hébergement Docker "nu" (pas encore HDS — voir infra/hds/README.md).
 # Données SYNTHÉTIQUES UNIQUEMENT : aucune donnée de santé réelle ici tant que
-# l'hébergement n'est pas certifié HDS (AGENTS.md §5, skill hds-hosting).
+# l'hébergement n'est pas certifié HDS (AGENTS.md, skill hds-hosting).
 #
 # Différences avec le docker-compose.yml de dev local (racine du dépôt) :
 #   - backend/ia sont des images publiées sur GHCR par le workflow
@@ -31,7 +31,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     # Jamais publié sur l'hôte : seul Caddy est exposé (80/443).
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infirmo} -d ${POSTGRES_DB:-infirmo}"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U ${POSTGRES_USER:-infirmo} -d ${POSTGRES_DB:-infirmo}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -53,6 +53,10 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-infirmo}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD doit etre defini dans .env (cf .env.staging.example)}@db:5432/${POSTGRES_DB:-infirmo}
       REDIS_URL: redis://redis:6379/0
+      INFIRMO_DEMO_MODE: ${INFIRMO_DEMO_MODE:-false}
+      INFIRMO_DEMO_EMAIL: ${INFIRMO_DEMO_EMAIL:-demo@infirmo.example}
+      INFIRMO_DEMO_PASSWORD: ${INFIRMO_DEMO_PASSWORD:-}
+    command: ["sh", "-c", "alembic upgrade head && if [ \"$$INFIRMO_DEMO_MODE\" = true ]; then python -m app.seed_demo; fi && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --no-access-log"]
     # Pas de "ports:" : backend n'est joignable que via Caddy, sur le réseau
     # "default" — jamais publié directement sur l'hôte.
     depends_on:
@@ -64,7 +68,7 @@ services:
       - default
       - internal
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=2)"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -84,6 +88,18 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+  mobile:
+    image: ${MOBILE_IMAGE:?MOBILE_IMAGE doit etre defini dans .env}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   caddy:
     image: caddy:2-alpine

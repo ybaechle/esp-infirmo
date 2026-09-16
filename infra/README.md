@@ -1,116 +1,55 @@
-# infra/ — Documentation DevOps INFIRMO
+# Infrastructure
 
-Infrastructure, CI/CD et hébergement du projet INFIRMO (INF-18).
-Ce fichier est le **point d'entrée** de toute la documentation DevOps : chaque
-sous-dossier a son propre README détaillé.
+Owner: Lazaro Marrero Rousse. Local and staging environments use synthetic data only.
 
-Owner : **Lazaro Marrero Rousse** (DevOps) — voir AGENTS.md §1.
+## Local executable v0.1
 
-## Carte des livrables DevOps
+Prerequisites: Git, Docker Engine/Desktop with Compose v2 supporting `--wait`, and
+Python 3.12+ for the acceptance check. Start Docker before running these commands
+from the repository root. Do not overwrite an existing `.env`.
 
-| Domaine | Tickets | Où |
-| ------- | ------- | -- |
-| Organisation GitHub, protection des branches | INF-1, INF-2 | [`infra/github/`](github/README.md) |
-| Conventions Git, commits, releases | INF-3 → INF-6 | [`CONTRIBUTING.md`](../CONTRIBUTING.md) · [`infra/github/`](github/README.md) |
-| Templates issues / PR avec DoD | INF-7 | [`.github/ISSUE_TEMPLATE/`](../.github/ISSUE_TEMPLATE/) · [`.github/PULL_REQUEST_TEMPLATE.md`](../.github/PULL_REQUEST_TEMPLATE.md) |
-| Stack locale Docker Compose | INF-8 | ce fichier (§ Démarrage local) · [`docker-compose.yml`](../docker-compose.yml) |
-| CI backend / mobile / IA | INF-9 → INF-11 | [`.github/workflows/`](../.github/workflows/) · [`infra/github/`](github/README.md) |
-| Staging + POC HDS | INF-12 | [`infra/deploy/`](deploy/README.md) · [`infra/hds/`](hds/README.md) |
-| Déploiement auto staging, production + rollback | INF-13, INF-14 | [`infra/deploy/`](deploy/README.md) |
-| Monitoring Prometheus/Grafana | INF-15 | [`infra/monitoring/`](monitoring/README.md) |
-| Sauvegardes PostgreSQL | INF-16 | [`infra/backup/`](backup/README.md) |
-| Tests de performance k6 | INF-17 | [`infra/perf/`](perf/README.md) |
-
-Terraform et Kubernetes (voir AGENTS.md §3) ne sont **pas encore utilisés** :
-ils arriveront si le besoin le justifie (contractualisation HDS, montée en
-charge). L'hébergement actuel est 100 % Docker Compose.
-
-## Démarrage local (Docker Compose)
-
-Environnement de développement local uniquement — **données synthétiques
-uniquement**, ce n'est pas l'environnement HDS (AGENTS.md §5,
-[`infra/hds/`](hds/README.md)).
-
-Prérequis : Docker + plugin `docker compose` (v2).
-
-```bash
-# 1. Copier le fichier d'exemple et renseigner un mot de passe local.
-#    .env est ignoré par git : ne jamais y mettre de vraies valeurs.
+```sh
 cp .env.example .env
-
-# 2. Construire les images et démarrer les services (db, redis, backend, ia).
-docker compose up -d --build
-
-# 3. Vérifier que le backend répond.
-curl http://localhost:8000/health         # liveness
-curl http://localhost:8000/health/ready   # readiness (Postgres + Redis réels)
-
-# 4. Arrêter et retirer les conteneurs.
-docker compose down
+docker compose up -d --build --wait --wait-timeout 180
+python infra/check_v01.py
 ```
 
-Le port hôte du backend est configurable (`BACKEND_PORT` dans `.env`, défaut
-8000) si un autre projet occupe déjà le port.
+Open http://localhost:8080. The public synthetic login is `demo@infirmo.example`
+with password `Infirmo-demo-2026!`. Override with `INFIRMO_DEMO_EMAIL` and
+`INFIRMO_DEMO_PASSWORD` in `.env`; pass the same environment variables to the
+acceptance script if changed. The backend applies Alembic migrations and runs an
+idempotent synthetic seed on startup. Saving a profile persists in PostgreSQL.
+`docker compose down` stops the stack while retaining its database volume.
 
-### Services
+| Service | Purpose | Host access |
+| --- | --- | --- |
+| mobile | Flutter web and `/api` reverse proxy | localhost:8080 (`WEB_PORT`) |
+| backend | Login, profile and readiness API | localhost:8000 (`BACKEND_PORT`) |
+| db | PostgreSQL/PostGIS | Private |
+| redis | Login throttle | Private |
+| ia | Health-only scaffold; Whisper not implemented | Private network |
+| prometheus / grafana | Optional `monitoring` profile | 9090 / 3001 |
 
-| Service | Rôle | Exposé sur l'hôte |
-| ------- | ---- | ------------------ |
-| `db` | PostgreSQL + PostGIS 16 | Non (activable ponctuellement, voir `docker-compose.yml`) |
-| `redis` | Redis 7 (pub/sub, cache) | Non |
-| `backend` | API FastAPI (scaffold DevOps, INF-8) — expose `/metrics` (INF-15) | `${BACKEND_PORT:-8000}` |
-| `ia` | Microservice IA (scaffold, sans Whisper) | Non — appelable uniquement par `backend`, réseau `internal` |
-| `prometheus` / `grafana` | Profil `monitoring` (INF-15), optionnel | `9090` / `3001` (configurables) |
+Record any unexpected local adjustment in `/reporting/`, fix its source procedure,
+and repeat from a clean environment. A successful local run does not constitute a
+third-party cold-start validation. Do not put real health data in this demo.
 
-`backend/` et `ia/` sont pour l'instant des **scaffolds DevOps minimaux**
-(healthchecks uniquement) : ils seront remplacés par le code applicatif réel
-des équipes backend et IA.
+## Quality and deployment
 
-## Environnements
+[Quality workflows](github/README.md) run all module checks and the Compose cold-start
+on every PR and push to `develop`/`main`. The stable **Quality gate** requires all
+four jobs to succeed. Backend/IA publish coverage and JUnit reports; mobile publishes
+LCOV. No missing app/test directory is silently accepted.
 
-| Environnement | Hébergement | Données | Documentation |
-| -------------- | ----------- | ------- | -------------- |
-| Local | `docker compose` sur la machine du développeur | Synthétiques | Ce fichier |
-| Staging | Serveur Docker « nu », non-HDS (déploiement auto depuis `develop`) | **Synthétiques uniquement** | [`infra/deploy/`](deploy/README.md) |
-| Production — cible HDS | Hébergeur certifié HDS (OVHcloud recommandé), déploiement depuis les tags semantic-release | Réelles (une fois l'hébergement HDS contractualisé + DPA signé) | [`infra/hds/`](hds/README.md) · [`infra/deploy/`](deploy/README.md) |
+[Staging and production runbook](deploy/README.md) documents SSH secrets, pinned
+images, synchronized configuration, readiness and rollback. Missing deployment
+configuration fails explicitly. No server provisioning or deployment is implied
+by the existence of these workflows.
 
-Aucune donnée de santé réelle ne doit transiter par les environnements local
-ou staging : c'est une obligation légale (Art. L.1111-8 CSP), pas une
-préférence — voir [`infra/hds/README.md`](hds/README.md).
+[Backup and restoration](backup/README.md) supports an explicit Compose and env file.
+[Monitoring](monitoring/README.md) records technical counters, not personal data.
+[Performance smoke test](perf/README.md) and [hosting constraints](hds/README.md)
+remain separate from the sprint governance metrics in `/reporting/`.
 
-## CI/CD (GitHub Actions)
-
-Le détail des workflows (déclencheurs, contenu) est documenté dans
-[`infra/github/README.md`](github/README.md). En résumé :
-
-- **Commitlint** sur chaque PR (commits + titre) ;
-- **Backend CI / IA CI / Mobile CI** filtrées par chemin (ruff + pytest via
-  uv ; flutter analyze/test, no-op tant que `mobile/` n'est pas initialisé) ;
-- **Release** : semantic-release publie les tags `<module>-vX.Y.Z` sur `main` ;
-- **Deploy Staging** : push `develop` → images GHCR → SSH (sauté tant que les
-  secrets ne sont pas configurés) ;
-- **Deploy Production** : tag de release → déploiement pinné ; rollback =
-  redéploiement d'une version antérieure (voir
-  [`infra/deploy/README.md`](deploy/README.md)).
-
-## Opérations
-
-| Sujet | Ticket | Portée | Documentation |
-| ----- | ------ | ------ | -------------- |
-| Monitoring (Prometheus + Grafana) | INF-15 | Profil `docker compose --profile monitoring` — métriques techniques uniquement, jamais de PHI | [`infra/monitoring/`](monitoring/README.md) |
-| Sauvegardes PostgreSQL | INF-16 | `backup.sh` / `restore.sh`, rotation — activité HDS n°6 pour les vraies données | [`infra/backup/`](backup/README.md) |
-| Tests de performance (k6) | INF-17 | Smoke test `/health` — uniquement contre des environnements à données synthétiques | [`infra/perf/`](perf/README.md) |
-
-## Secrets et fichiers ignorés
-
-- Aucun secret dans le dépôt : `.env`, `*.tfvars`, `kubeconfig`, `secrets/`
-  sont ignorés — committer des `*.example` à la place.
-- Les secrets de déploiement (SSH staging/production) vivent dans **GitHub
-  Secrets** — tableau complet dans [`infra/deploy/README.md`](deploy/README.md).
-- `docker-compose.override.yml` est ignoré pour les ajustements locaux.
-
-## Versionnement
-
-`infra/` est versionné avec ce qu'il déploie : il n'y a **pas** de tag
-`infra-v*` (voir AGENTS.md §2). Les modules applicatifs sont relâchés en
-`<module>-vX.Y.Z` par semantic-release.
+Terraform and Kubernetes are not used. Module releases remain independent;
+`infra/` follows the repository revision containing its deployment configuration.

@@ -48,7 +48,7 @@ Grafana est provisionné automatiquement (pas de config manuelle dans l'UI) :
 - accès anonyme désactivé (`GF_AUTH_ANONYMOUS_ENABLED=false`), authentification
   admin obligatoire.
 
-## Règle PHI dans les métriques (AGENTS.md §5.6)
+## Règle PHI dans les métriques (AGENTS.md)
 
 **Aucune donnée de santé ni secret ne doit jamais apparaître dans une
 métrique, un label ou un dashboard.** Le backend expose `/metrics` via
@@ -71,5 +71,5 @@ transmission ni de PHI (voir aussi `secure-coding-sante`).
 
 Comme le reste de `docker-compose.yml`, ce profil est pour le **dev local
 avec données synthétiques uniquement** — pas l'environnement HDS (voir
-`infra/hds/README.md` et AGENTS.md §5). L'équivalent en staging/production
+`infra/hds/README.md` et AGENTS.md). L'équivalent en staging/production
 n'est pas encore mis en place (hors périmètre INF-15).

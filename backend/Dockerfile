@@ -1,5 +1,4 @@
-# infirmo-backend — image Docker du scaffold DevOps (INF-8).
-# À faire évoluer par l'équipe backend au fur et à mesure de l'app réelle.
+# infirmo-backend — démonstration synthétique T9.
 
 FROM python:3.12-slim
 
@@ -20,6 +19,8 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --locked --no-dev --no-install-project
 
 COPY app ./app
+COPY alembic.ini ./
+COPY migrations ./migrations
 
 # Utilisateur non-root.
 RUN useradd --create-home --uid 1000 appuser \
@@ -28,4 +29,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]

@@ -10,7 +10,7 @@ Il doit rester aligné avec le cahier des charges INFIRMO v4 et avec le GitHub P
 
 Le projet est organisé dans un dépôt principal unique : `infirmo`.
 
-Ce dépôt sert de mono-repo pour centraliser la documentation, le code applicatif et la configuration DevOps. La structure complète sera mise en place progressivement au fur et à mesure du développement.
+Ce dépôt sert de mono-repo pour centraliser la documentation, le code applicatif et la configuration DevOps. La structure est en place; le README précise le périmètre exécutable actuel.
 
 Structure cible du dépôt :
 
@@ -81,11 +81,11 @@ Le ticket reste rattaché à M1 dans le cahier des charges, mais son exécution 
 
 Le champ `Sprint` dans GitHub Projects est un champ de type itération. Il contient les cycles opérationnels de travail.
 
-Les sprints configurés sont les suivants :
+Le calendrier de référence est le suivant; son application dans le Project courant reste à vérifier :
 
 | Sprint | Période | Objectif opérationnel |
 | ------ | ------- | -------------------- |
-| Sprint 1 | 11/09/2026 - 24/09/2026 | Lancement technique : structure du dépôt, conventions, setup mobile/backend/IA, Docker, CI initiale. |
+| Sprint 1 | 11/09/2026 - 24/09/2026 | Socle et incrément synthétique connexion/profil persistant, contrôles et reporting T9; voir reporting/sprint-1.md. |
 | Sprint 2 | 25/09/2026 - 27/11/2026 | Développement MVP Core : authentification, profils, documents, matching, premières intégrations. |
 | Sprint 3 | 30/11/2026 - 22/01/2027 | Remplacements et communication : candidatures, calendrier, messagerie, transmissions, IA. |
 | Sprint 4 | 29/01/2027 - 05/03/2027 | Tests, intégration, sécurité, optimisation et stabilisation de l’application. |
@@ -104,7 +104,9 @@ Chaque ticket doit conserver les informations suivantes :
 | Champ | Usage |
 | ----- | ----- |
 | `Assignees` | Membre responsable du ticket. |
-| `Estimation JH` | Charge estimée en jours-hommes. |
+| `Estimation JH` | Charge initiale en jours-hommes (1 JH = 7 h); ne pas réécrire après démarrage. |
+| `Actual hours` / `ETC hours` | Heures réellement passées et reste à faire réestimé, avec date de mesure. |
+| `Evidence` | Commit, tests, couverture, Delta Log, ADR et validation recette. |
 | `Priority` | Priorité native GitHub : High, Medium ou Low. |
 | `Epic` | Domaine fonctionnel ou technique : auth, mobile, backend, IA, DevOps, tests, documentation, etc. |
 | `WBS_Code` | Code WBS permettant la traçabilité avec le cahier des charges. |
@@ -283,7 +285,7 @@ npx git-cz
 
 Outils :
 
-- Black pour le formatage ;
+- Ruff pour le formatage (`ruff format`) ;
 - Ruff pour le linting ;
 - pytest pour les tests.
 
@@ -298,8 +300,8 @@ Commandes recommandées :
 
 ```bash
 ruff check .
-black .
-pytest
+ruff format --check .
+python -m pytest
 ```
 
 ### Dart / Flutter — mobile
@@ -369,7 +371,7 @@ La documentation doit être maintenue au fil du projet.
 | Cahier des charges | `docs/livrables/` |
 | Documentation API | Swagger / OpenAPI |
 
-Les README de module peuvent être créés progressivement lorsque les dossiers correspondants sont initialisés.
+Les README de module et le protocole principal doivent correspondre aux commandes réellement exécutées.
 
 La documentation doit être mise à jour lorsqu’une fonctionnalité, une commande ou une configuration change.
 
@@ -383,12 +385,16 @@ Une contribution est considérée comme terminée uniquement lorsque les critèr
 - [ ] Le ticket GitHub Projects est à jour.
 - [ ] Les critères d’acceptation du ticket sont validés.
 - [ ] Les tests automatisés passent lorsque le ticket est concerné.
-- [ ] La CI est verte lorsque la CI est disponible.
+- [ ] Le contrôle `Quality gate` est exécuté et vert au commit proposé. Une CI indisponible ou ignorée reste un blocage.
 - [ ] Aucune régression critique n’est introduite.
 - [ ] Les règles de sécurité sont respectées.
 - [ ] Aucun secret n’est présent dans le code.
 - [ ] La documentation est mise à jour si nécessaire.
-- [ ] La fonctionnalité est validée en environnement de recette ou démontrée si applicable.
+- [ ] La fonctionnalité est déployée et validée en recette, avec révision, résultat de readiness et preuve du parcours d'acceptation.
+- [ ] Les écarts de procédure sont enregistrés et corrigés dans leur source; les reprises propres sont liées au Delta Log.
+- [ ] Les heures réelles, l'ETC et les preuves du ticket sont actualisés; les inconnues ne sont pas remplacées par zéro.
+- [ ] Les décisions structurelles disposent d'un ADR; les instructions d'installation correspondent au code livré.
+- [ ] Pour une livraison d'incrément : le README a été exécuté par un pair sur un environnement propre et le résultat est consigné dans `reporting/onboarding.md`.
 
 Un ticket ne doit être déplacé en `Done` que lorsque cette Definition of Done est respectée.
 
@@ -433,7 +439,13 @@ Chaque membre de l’équipe doit :
 
 ---
 
-## 17. Références
+## 17. Reporting et attribution
+
+Le lot PM-4 utilise [reporting/README.md](reporting/README.md). Chaque jour projet, le responsable met à jour le réel et l’ETC de ses tâches; la cheffe de projet consolide les indicateurs. Les comptes rendus décrivent uniquement des réunions réellement tenues. Daily : 15 minutes; planning, revue et rétrospective : 20 minutes chacun, regroupables dans une heure.
+
+Utiliser les identités Git humaines existantes. Ne pas ajouter d’auteur automatique, de co-auteur automatique, de lien de session ou de signature générée aux commits et aux contributions. Préserver les auteurs humains historiques; ne pas inventer d’activité pour équilibrer les statistiques.
+
+## 18. Références
 
 - Cahier des charges INFIRMO v4
 - GitHub Projects du projet INFIRMO

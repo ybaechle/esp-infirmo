@@ -9,7 +9,7 @@ des branches).
 | Élément | Valeur |
 | ------- | ------ |
 | Organisation | `EpitechMscProPromo2027` |
-| Dépôt | `T-ESP-800-project-100856-NCY_Infirmo` |
+| Dépôt | `T-ESP-901-NCY-9-1-T-ESP-901-1` |
 | Visibilité | Privé |
 | Branche par défaut | `main` |
 | Suivi du backlog | GitHub Projects (champs `Sprint`, `Priority`, `Epic`, `WBS_Code`…) |
@@ -48,7 +48,7 @@ puis importer chaque fichier JSON de `rulesets/`.
 Via l'API :
 
 ```bash
-REPO=EpitechMscProPromo2027/T-ESP-800-project-100856-NCY_Infirmo
+REPO=EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1
 gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch-main.json
 gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch-develop.json
 ```
@@ -67,33 +67,65 @@ gh api "repos/$REPO/rulesets" --method POST --input infra/github/rulesets/branch
   au format `<module>-vX.Y.Z` (`backend/.releaserc.json`, etc. — les
   `package.json` de module sont des manifestes de release, pas du code).
 
-## Intégration continue (INF-9 → INF-11)
+## Quality checks
 
-| Workflow | Fichier | Déclencheur | Contenu |
-| -------- | ------- | ----------- | ------- |
-| Commitlint | `commitlint.yml` | toute PR | commits + titre de PR conventionnels |
-| Backend CI | `backend-ci.yml` | changements `backend/**` | `ruff check` + `ruff format --check` + `pytest` (uv, lockfile) |
-| IA CI | `ia-ci.yml` | changements `ia/**` | idem backend |
-| Mobile CI | `mobile-ci.yml` | changements `mobile/**` | `dart format` + `flutter analyze` + `flutter test` (no-op vert tant que l'app Flutter n'est pas initialisée) |
-| Release | `release.yml` | push `main` | semantic-release par module |
+`quality.yml` runs on all PRs and all `develop`/`main` pushes. Reusable workflows
+validate backend, IA and mobile. The cold-start job builds the complete Compose
+stack and runs `infra/check_v01.py`. The stable **Quality gate** requires all four
+results to be `success`, including when a dependency fails or is skipped.
 
-Les CI de module sont filtrées par chemin : elles ne tournent que quand le
-module change (plus leur propre fichier de workflow).
+Backend/IA: Ruff, pytest, coverage >=70%, XML/JUnit reports. Mobile: formatting,
+analysis, tests with LCOV and web build. Report figures with SHA and date in
+`/reporting/`. Missing Actions budget is an execution blocker, not a test result.
 
-### Évolutions prévues
+The versioned rulesets require `Quality gate`. An administrator must still apply
+them using the commands above and verify active remote rules. JSON files alone
+do not protect branches. Update existing rulesets by ID rather than duplicating.
+These quality checks have no path filters that could leave PRs pending.
 
-- Ajouter les **status checks requis** (CI backend / mobile / IA / commitlint)
-  dans les rulesets une fois les noms de checks stabilisés — voir
-  `.github/workflows/`. Ne pas exiger un check filtré par chemin : une PR qui ne
-  déclenche pas le workflow resterait bloquée.
+### Vérification technique en lecture seule
 
-## Déploiement (INF-12 → INF-14)
+Depuis la racine, avec Python 3.12+ et l'authentification `gh` existante :
 
-| Workflow | Fichier | Déclencheur | Contenu |
-| -------- | ------- | ----------- | ------- |
-| Deploy Staging | `deploy-staging.yml` | push `develop` (chemins `backend/**`, `ia/**`, `infra/deploy/**`) ou `workflow_dispatch` ; PR sur le workflow → build de validation seul | Build + push GHCR (`backend`, `ia`) puis déploiement SSH sur le serveur staging |
-| Deploy Production | `deploy-production.yml` | push d'un tag `backend-v*` / `ia-v*` (semantic-release), ou `workflow_dispatch` (déploiement manuel / rollback) | Build + push GHCR (sur tag uniquement) puis déploiement SSH sur le serveur de production |
+```sh
+python -m unittest discover -s infra/github -p "test_*.py"
+python infra/github/check_protections.py --output reporting/evidence/branch-protection.json
+```
 
-Détail (architecture, secrets à configurer, procédure de rollback) :
-[`infra/deploy/README.md`](../deploy/README.md). Rappel hébergement de
-données de santé : [`infra/hds/README.md`](../hds/README.md).
+Le contrôle interroge les branches exactes `main` et `develop`, leurs SHA et les
+permissions du compte. L'endpoint GitHub des [règles applicables à une branche](https://docs.github.com/en/rest/repos/rules#get-rules-for-a-branch)
+renvoie uniquement les règles **actives et applicables**, y compris celles de
+l'organisation. Une règle inactive ou destinée à une autre branche ne suffit pas.
+La protection classique est lue si nécessaire; les exigences peuvent être
+cumulées entre les deux mécanismes.
+
+Comparaison avec les JSON versionnés : PR obligatoire, au moins une approbation,
+révocation des approbations périmées, résolution des discussions, interdiction du
+force-push et de la suppression, contrôle `Quality gate` obligatoire avec branche
+à jour. La preuve contient l'heure UTC, les SHA des branches, les empreintes des
+fichiers attendus et les contrôles absents.
+
+- Sortie **0** : exigences contrôlées présentes dans la configuration lisible.
+- Sortie **1** : exigences vérifiées absentes.
+- Sortie **2** : état inconnu (API inaccessible, permissions de lecture insuffisantes
+  ou réponse inexploitable). Un 404 ambigu n'est pas une absence prouvée.
+
+Ce script ne crée ni ne modifie aucune règle, permission ou référence Git. Il ne
+teste pas les exceptions de contournement ni les méthodes de fusion; il ne prouve
+pas le rejet d'une écriture. Un `git push --dry-run` n'est pas une preuve de
+l'application des protections. En cas d'absence confirmée, seul un administrateur
+ou un rôle explicitement autorisé à gérer les règles peut appliquer/corriger les rulesets ci-dessus; relancer ensuite le contrôle avec
+le même compte, sans demander de nouveaux droits.
+
+Le 15/09/2026, le rôle distant `student` a également été testé avec une demande
+d'application du ruleset `main` versionné : GitHub a répondu `HTTP 404: Not Found`.
+Aucune règle n'a été créée. La [réponse conservée](../../reporting/evidence/branch-protection-apply.json)
+confirme que l'application n'est pas disponible avec cet accès; elle ne distingue
+pas à elle seule une restriction de permission d'une restriction de plateforme.
+
+## Deployment
+
+Staging follows a successful Quality push run on `develop`. Release validates the
+quality suite on `main`, then explicitly dispatches each new module tag to Deploy
+Production. See [deployment](../deploy/README.md) for secrets, persisted versions,
+readiness, acceptance and rollback.

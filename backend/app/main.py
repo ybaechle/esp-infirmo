@@ -1,28 +1,44 @@
-"""infirmo-backend — scaffold DevOps (INF-8).
-
-Application FastAPI minimale exposant uniquement des health checks pour
-valider l'orchestration Docker Compose locale (INF-8). Ce fichier N'EST PAS
-l'application backend finale : il sera remplacé par l'équipe backend
-(Louis/Ziad) quand leurs tickets applicatifs démarreront.
-
-Configuration 12-factor : tout vient des variables d'environnement, aucun
-secret ni valeur par défaut sensible n'est codé en dur ici.
-"""
+"""Infirmo health checks and explicitly enabled synthetic T9 demonstration."""
 
 import os
 
 import psycopg
 import redis
 from fastapi import FastAPI, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.demo import router
 
 app = FastAPI(title="infirmo-backend", version="0.1.0")
+app.include_router(router)
+
+
+@app.exception_handler(RequestValidationError)
+async def invalid_request(request, exc):
+    return JSONResponse(status_code=422, content={"detail": "Invalid request"})
+
+
+@app.exception_handler(SQLAlchemyError)
+async def database_unavailable(request, exc):
+    return JSONResponse(status_code=503, content={"detail": "Service unavailable"})
+
+
+@app.middleware("http")
+async def private_api_responses(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
 
 # /metrics (INF-15) : compteurs/latences par route uniquement (métriques
 # Prometheus par défaut de l'instrumentator). AUCUNE donnée de santé ni
 # secret n'y transite : pas de corps de requête/réponse, pas de payload
 # métier — seulement méthode, chemin de la route, code de statut, durée
-# (AGENTS.md §5.6, "No PHI/secrets in observability").
+# Ne jamais inclure de corps ni de jeton dans les métriques.
 Instrumentator().instrument(app).expose(app)
 
 # Timeouts courts : un /health/ready doit répondre vite, y compris quand une

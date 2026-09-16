@@ -1,0 +1,106 @@
+{
+  "collected_at": "2026-09-15T13:47:15.263140+00:00",
+  "repository": "EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1",
+  "branch": "develop",
+  "window": "latest 100 runs (or fewer if unavailable)",
+  "runs": [
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-09-15T13:22:51Z",
+      "databaseId": 34974619787,
+      "headSha": "47862ed5088aab115743e5ebffdcbd84327921cd",
+      "status": "completed",
+      "updatedAt": "2026-09-15T13:22:56Z",
+      "url": "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/actions/runs/34974619787",
+      "workflowName": "Mobile CI",
+      "infrastructure_blocked": true,
+      "blocker_messages": [
+        "The job was not started because an Actions budget is preventing further use."
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-09-15T13:22:51Z",
+      "databaseId": 34974619689,
+      "headSha": "47862ed5088aab115743e5ebffdcbd84327921cd",
+      "status": "completed",
+      "updatedAt": "2026-09-15T13:22:56Z",
+      "url": "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/actions/runs/34974619689",
+      "workflowName": "IA CI",
+      "infrastructure_blocked": true,
+      "blocker_messages": [
+        "The job was not started because an Actions budget is preventing further use."
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-09-15T13:22:51Z",
+      "databaseId": 34974619702,
+      "headSha": "47862ed5088aab115743e5ebffdcbd84327921cd",
+      "status": "completed",
+      "updatedAt": "2026-09-15T13:22:56Z",
+      "url": "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/actions/runs/34974619702",
+      "workflowName": "Backend CI",
+      "infrastructure_blocked": true,
+      "blocker_messages": [
+        "The job was not started because an Actions budget is preventing further use."
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-09-15T12:40:52Z",
+      "databaseId": 34970282948,
+      "headSha": "bbd83d5cff675258ed3dcd7069a4f211abfa5000",
+      "status": "completed",
+      "updatedAt": "2026-09-15T12:40:57Z",
+      "url": "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/actions/runs/34970282948",
+      "workflowName": "Backend CI",
+      "infrastructure_blocked": true,
+      "blocker_messages": [
+        "The job was not started because an Actions budget is preventing further use."
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-09-15T12:40:52Z",
+      "databaseId": 34970282934,
+      "headSha": "bbd83d5cff675258ed3dcd7069a4f211abfa5000",
+      "status": "completed",
+      "updatedAt": "2026-09-15T12:40:56Z",
+      "url": "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/actions/runs/34970282934",
+      "workflowName": "IA CI",
+      "infrastructure_blocked": true,
+      "blocker_messages": [
+        "The job was not started because an Actions budget is preventing further use."
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-09-15T12:40:52Z",
+      "databaseId": 34970282897,
+      "headSha": "bbd83d5cff675258ed3dcd7069a4f211abfa5000",
+      "status": "completed",
+      "updatedAt": "2026-09-15T12:40:56Z",
+      "url": "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/actions/runs/34970282897",
+      "workflowName": "Mobile CI",
+      "infrastructure_blocked": true,
+      "blocker_messages": [
+        "The job was not started because an Actions budget is preventing further use."
+      ]
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-09-15T12:40:52Z",
+      "databaseId": 34970282916,
+      "headSha": "bbd83d5cff675258ed3dcd7069a4f211abfa5000",
+      "status": "completed",
+      "updatedAt": "2026-09-15T12:40:57Z",
+      "url": "https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1/actions/runs/34970282916",
+      "workflowName": "Deploy Staging",
+      "infrastructure_blocked": true,
+      "blocker_messages": [
+        "The job was not started because an Actions budget is preventing further use."
+      ]
+    }
+  ]
+}

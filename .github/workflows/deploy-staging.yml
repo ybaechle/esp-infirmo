@@ -1,130 +1,65 @@
 name: Deploy Staging
-
-# INF-13 — build + push des images backend/ia sur GHCR puis déploiement SSH
-# sur le serveur staging (hébergement Docker non-HDS, données SYNTHÉTIQUES
-# uniquement — voir infra/hds/README.md et AGENTS.md §5).
-#
-# - push sur develop (ou workflow_dispatch) : build-push construit et publie
-#   les images, puis deploy se connecte en SSH pour les tirer et redémarrer
-#   le stack.
-# - pull_request touchant uniquement ce fichier : build-validation construit
-#   les images SANS les publier, pour donner un check vert auto-prouvé sur la
-#   PR sans droits d'écriture sur le registre.
 on:
-  push:
+  workflow_run:
+    workflows: [Quality]
+    types: [completed]
     branches: [develop]
-    paths:
-      - "backend/**"
-      - "ia/**"
-      - "infra/deploy/**"
-      - ".github/workflows/deploy-staging.yml"
-  workflow_dispatch:
-  pull_request:
-    paths:
-      - ".github/workflows/deploy-staging.yml"
-
 permissions:
   contents: read
-
+concurrency: deploy-staging
 jobs:
-  build-push:
-    name: Build + push images (GHCR)
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+  deploy:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
+    environment: staging
     permissions:
       contents: read
       packages: write
-    outputs:
-      image_base: ${{ steps.vars.outputs.image_base }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Nom d'image en minuscules
-        id: vars
-        run: echo "image_base=${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-
-      - name: SHA court
-        id: sha
-        run: echo "short=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-
-      - uses: docker/setup-buildx-action@v3
-
-      - name: Connexion GHCR
-        uses: docker/login-action@v3
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Validate deployment configuration
+        env:
+          HOST: ${{ secrets.STAGING_SSH_HOST }}
+          USER: ${{ secrets.STAGING_SSH_USER }}
+          KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_SSH_KNOWN_HOSTS }}
+        run: |
+          test -n "$HOST" && test -n "$USER" && test -n "$KEY" && test -n "$KNOWN_HOSTS" || { echo '::error::Missing staging SSH configuration'; exit 1; }
+          mkdir -p ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Image coordinates
+        id: image
+        env:
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          echo "base=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          echo "tag=sha-$SHA" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build + push backend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          push: true
-          tags: |
-            ghcr.io/${{ steps.vars.outputs.image_base }}/backend:develop
-            ghcr.io/${{ steps.vars.outputs.image_base }}/backend:sha-${{ steps.sha.outputs.short }}
-
-      - name: Build + push ia
-        uses: docker/build-push-action@v6
-        with:
-          context: ./ia
-          push: true
-          tags: |
-            ghcr.io/${{ steps.vars.outputs.image_base }}/ia:develop
-            ghcr.io/${{ steps.vars.outputs.image_base }}/ia:sha-${{ steps.sha.outputs.short }}
-
-  build-validation:
-    name: Build validation (PR sur ce workflow)
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: docker/setup-buildx-action@v3
-
-      - name: Build backend (sans publication)
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend
-          push: false
-
-      - name: Build ia (sans publication)
-        uses: docker/build-push-action@v6
-        with:
-          context: ./ia
-          push: false
-
-  deploy:
-    name: Déploiement staging (SSH)
-    needs: build-push
-    if: needs.build-push.result == 'success'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Déployer sur le serveur staging
+      - name: Build and publish verified revision
         env:
-          STAGING_SSH_HOST: ${{ secrets.STAGING_SSH_HOST }}
-          STAGING_SSH_USER: ${{ secrets.STAGING_SSH_USER }}
-          STAGING_SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          BASE: ${{ steps.image.outputs.base }}
+          TAG: ${{ steps.image.outputs.tag }}
         run: |
-          set -euo pipefail
-
-          if [ -z "$STAGING_SSH_HOST" ] || [ -z "$STAGING_SSH_USER" ] || [ -z "$STAGING_SSH_KEY" ]; then
-            echo "::notice::Pas de serveur staging configuré — déploiement sauté"
-            exit 0
-          fi
-
-          mkdir -p ~/.ssh
-          printf '%s\n' "$STAGING_SSH_KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "$STAGING_SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-
-          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$STAGING_SSH_USER@$STAGING_SSH_HOST" bash -s <<'REMOTE'
-            set -e
-            docker compose -f ~/infirmo/docker-compose.staging.yml pull
-            docker compose -f ~/infirmo/docker-compose.staging.yml up -d
-          REMOTE
+          for module in backend ia mobile; do
+            docker build -t "$BASE/$module:$TAG" "$module"
+            docker push "$BASE/$module:$TAG"
+          done
+      - name: Synchronize configuration and deploy
+        env:
+          HOST: ${{ secrets.STAGING_SSH_HOST }}
+          USER: ${{ secrets.STAGING_SSH_USER }}
+          BASE: ${{ steps.image.outputs.base }}
+          TAG: ${{ steps.image.outputs.tag }}
+        run: |
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$USER@$HOST" 'mkdir -p ~/infirmo'
+          scp -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes infra/deploy/docker-compose.staging.yml infra/deploy/Caddyfile infra/deploy/deploy.sh infra/check_v01.py "$USER@$HOST:infirmo/"
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$USER@$HOST" "bash ~/infirmo/deploy.sh backend $BASE/backend:$TAG ia $BASE/ia:$TAG mobile $BASE/mobile:$TAG"
+          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=yes "$USER@$HOST" 'cd ~/infirmo && docker compose --env-file .env --env-file .images.env -f docker-compose.staging.yml exec -T backend python - --url http://mobile < check_v01.py'

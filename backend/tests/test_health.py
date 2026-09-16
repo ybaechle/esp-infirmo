@@ -51,7 +51,7 @@ def test_health_ready_returns_503_when_env_vars_missing(monkeypatch) -> None:
 
 def test_metrics_exposes_prometheus_http_metrics() -> None:
     """INF-15 : /metrics doit exposer les métriques standard (comptages,
-    latence) sans jamais contenir de donnée de santé (AGENTS.md §5.6)."""
+    latence) sans jamais contenir de donnée de santé (AGENTS.md)."""
     client.get("/health")
 
     response = client.get("/metrics")

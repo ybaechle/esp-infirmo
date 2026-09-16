@@ -1,68 +1,29 @@
 name: Mobile CI
-
-# INF-10 — analyse (flutter analyze), format (dart format) et tests
-# (flutter test) du module mobile/.
-# Tant que l'app Flutter n'est pas initialisée (pas de pubspec.yaml), le
-# workflow se termine en no-op vert : la CI est prête avant le code.
 on:
-  pull_request:
-    paths:
-      - "mobile/**"
-      - ".github/workflows/mobile-ci.yml"
-  push:
-    branches: [develop, main]
-    paths:
-      - "mobile/**"
-      - ".github/workflows/mobile-ci.yml"
-
+  workflow_call:
 permissions:
   contents: read
-
 jobs:
   analyze-test:
-    name: flutter analyze + test
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
     steps:
       - uses: actions/checkout@v4
-
-      - name: Vérifier que l'app Flutter est initialisée
-        id: flutter-app
-        run: |
-          if [ -f mobile/pubspec.yaml ]; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::mobile/ pas encore initialisé (pas de pubspec.yaml) — no-op."
-          fi
-
       - uses: subosito/flutter-action@v2
-        if: steps.flutter-app.outputs.exists == 'true'
         with:
           channel: stable
           flutter-version: 3.44.0
           cache: true
-
-      - name: Dépendances
-        if: steps.flutter-app.outputs.exists == 'true'
-        working-directory: mobile
-        run: flutter pub get
-
-      - name: Format (dart format)
-        if: steps.flutter-app.outputs.exists == 'true'
-        working-directory: mobile
-        run: dart format --output=none --set-exit-if-changed .
-
-      - name: Analyse statique
-        if: steps.flutter-app.outputs.exists == 'true'
-        working-directory: mobile
-        run: flutter analyze
-
-      - name: Tests
-        if: steps.flutter-app.outputs.exists == 'true'
-        working-directory: mobile
-        run: |
-          if [ -d test ]; then
-            flutter test
-          else
-            echo "::notice::Pas de dossier test/ — étape ignorée."
-          fi
+      - run: flutter pub get --enforce-lockfile
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze
+      - run: flutter test --coverage --reporter expanded
+      - run: flutter build web --release
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mobile-quality
+          path: mobile/coverage/lcov.info
+          if-no-files-found: warn
