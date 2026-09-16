@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
-/// Thème Material dérivé des jetons INFIRMO.
-///
-/// Les composants du dossier `widgets/` portent le rendu fidèle aux maquettes ;
-/// ce thème fixe les valeurs par défaut (police, fond, sélection de texte).
+/// Thème Material dérivé des constantes INFIRMO.
 abstract final class AppTheme {
   static ThemeData get light {
     final scheme =

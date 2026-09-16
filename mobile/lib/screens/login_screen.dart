@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_colors.dart';
 import '../theme/app_dimens.dart';
 import '../theme/app_typography.dart';
@@ -8,14 +9,10 @@ import '../widgets/infirmo_button.dart';
 import '../widgets/infirmo_logo.dart';
 import '../widgets/infirmo_text_field.dart';
 
-/// Écran de connexion INFIRMO (maquette « Login »).
-///
-/// Le parent fournit [onSubmit] qui tente l'authentification et renvoie un
-/// message d'erreur à afficher (ou `null` en cas de succès).
+/// Écran de connexion INFIRMO.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.onSubmit});
 
-  /// Tente la connexion. Retourne `null` si réussie, sinon le message d'erreur.
   final Future<String?> Function(String email, String password) onSubmit;
 
   @override
@@ -29,9 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _busy = false;
   bool _obscure = true;
-
-  /// Erreur d'authentification renvoyée par le backend (bordures rouges des
-  /// deux champs + message global sous le formulaire).
   String? _authError;
 
   @override
@@ -137,8 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   FormMessage(text: _authError!),
                 ],
                 const SizedBox(height: AppDimens.gap24),
-                // TEMP : identifiants de démonstration affichés à la demande,
-                // à retirer ultérieurement.
+                // TODO : à retirer.
                 const SelectableText(
                   'Compte fictif : demo@infirmo.example\n'
                   'Mot de passe : Infirmo-demo-2026!',

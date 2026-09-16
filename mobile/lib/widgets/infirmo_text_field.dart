@@ -3,13 +3,7 @@ import '../theme/app_colors.dart';
 import '../theme/app_dimens.dart';
 import '../theme/app_typography.dart';
 
-/// Champ de saisie INFIRMO : un libellé en gras au-dessus d'un champ blanc à
-/// coins arrondis et bordure noire, qui passe en rouge en cas d'erreur.
-///
-/// Deux sources d'erreur, combinables :
-///  - [validator] : validation par formulaire (message rouge sous le champ) ;
-///  - [hasError]  : force la bordure rouge sans message local (ex. erreur
-///    d'authentification affichée globalement sous le formulaire).
+/// Champ de saisie INFIRMO.
 class InfirmoTextField extends StatelessWidget {
   const InfirmoTextField({
     super.key,
@@ -33,14 +27,9 @@ class InfirmoTextField extends StatelessWidget {
   final String label;
   final TextEditingController? controller;
   final String? hintText;
-
-  /// Widget optionnel aligné à droite du libellé (ex. lien d'aide teal).
   final Widget? trailing;
-
   final bool obscureText;
   final bool enabled;
-
-  /// Force la bordure rouge indépendamment du [validator].
   final bool hasError;
 
   final TextInputType? keyboardType;

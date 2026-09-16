@@ -3,15 +3,13 @@ import '../theme/app_colors.dart';
 import '../theme/app_dimens.dart';
 import '../theme/app_typography.dart';
 
-/// Option d'un [InfirmoDropdownField].
 class InfirmoDropdownOption<T> {
   const InfirmoDropdownOption({required this.value, required this.label});
   final T value;
   final String label;
 }
 
-/// Sélecteur INFIRMO : même habillage que [InfirmoTextField] (libellé au-dessus,
-/// champ blanc arrondi à bordure noire) mais pour un choix parmi une liste.
+/// Sélecteur INFIRMO assorti à [InfirmoTextField].
 class InfirmoDropdownField<T> extends StatelessWidget {
   const InfirmoDropdownField({
     super.key,
@@ -43,8 +41,6 @@ class InfirmoDropdownField<T> extends StatelessWidget {
           child: Text(label, style: AppText.fieldLabel),
         ),
         DropdownButtonFormField<T>(
-          // Clé liée à la valeur : garantit que l'affichage suit la sélection
-          // même si `initialValue` n'est lu qu'à la première construction.
           key: ValueKey('$label-$value'),
           initialValue: value,
           isExpanded: true,

@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 
-/// Message textuel au niveau du formulaire (erreur globale ou confirmation),
-/// annoncé aux lecteurs d'écran via une région « live ».
-///
-/// Exemple : « E-mail ou mot de passe incorrect. » sous les champs de connexion.
+/// Message d'erreur ou de confirmation au niveau du formulaire.
 class FormMessage extends StatelessWidget {
   const FormMessage({super.key, required this.text, this.isError = true});
 

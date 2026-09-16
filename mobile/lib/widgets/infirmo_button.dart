@@ -3,19 +3,9 @@ import '../theme/app_colors.dart';
 import '../theme/app_dimens.dart';
 import '../theme/app_typography.dart';
 
-/// Variantes visuelles d'un [InfirmoButton].
-enum InfirmoButtonVariant {
-  /// Fond rouge plein, texte blanc (action principale).
-  primary,
-
-  /// Fond blanc, bordure noire, texte noir (action secondaire).
-  secondary,
-}
+enum InfirmoButtonVariant { primary, secondary }
 
 /// Bouton pleine largeur d'INFIRMO.
-///
-/// Gère l'état désactivé (grisé) et un état occupé qui remplace le libellé par
-/// un indicateur de progression, sans changer la taille du bouton.
 class InfirmoButton extends StatelessWidget {
   const InfirmoButton({
     super.key,

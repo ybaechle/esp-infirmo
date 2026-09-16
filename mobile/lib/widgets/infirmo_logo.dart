@@ -2,14 +2,10 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
 
-/// Logo « INFIRMO » : le mot en Permanent Marker posé sur une barre de
-/// surlignage jaune qui recouvre la moitié basse des lettres.
-///
-/// Décorations « graffiti » de la maquette volontairement absentes.
+/// Logo « INFIRMO ».
 class InfirmoLogo extends StatelessWidget {
   const InfirmoLogo({super.key, this.style});
 
-  /// Permet d'ajuster la taille sans dupliquer la logique de surlignage.
   final TextStyle? style;
 
   @override
@@ -24,7 +20,6 @@ class InfirmoLogo extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Barre jaune : ~40 % de la hauteur du mot, alignée sur le bas.
             Positioned(
               left: 0,
               right: 0,

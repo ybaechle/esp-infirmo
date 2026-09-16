@@ -10,10 +10,6 @@ import '../widgets/infirmo_dropdown_field.dart';
 import '../widgets/infirmo_text_field.dart';
 
 /// Écran de modification des informations du compte.
-///
-/// Reprend l'habillage de la maquette « Créer un compte » (chevron retour,
-/// grand titre, champs libellés, bouton en pied) avec les champs du contrat
-/// `/profile` existant : nom professionnel, statut et ville.
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
     super.key,
@@ -23,11 +19,7 @@ class EditProfileScreen extends StatefulWidget {
   });
 
   final Profile initialProfile;
-
-  /// Enregistre le profil. Retourne `null` si réussi, sinon le message d'erreur.
   final Future<String?> Function(Profile profile) onSave;
-
-  /// Quitte l'écran (déconnexion + retour à la connexion).
   final Future<void> Function() onBack;
 
   @override
@@ -108,7 +100,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SizedBox(height: AppDimens.gap8),
           Row(
             children: [
-              // Chevron 24×24 aligné à 20px du bord (marge de page = 24px).
               Transform.translate(
                 offset: const Offset(-4, 0),
                 child: _BackButton(onPressed: _busy ? null : _back),
@@ -180,7 +171,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 }
 
-/// Chevron de retour épais, aligné sur la maquette.
 class _BackButton extends StatelessWidget {
   const _BackButton({required this.onPressed});
 

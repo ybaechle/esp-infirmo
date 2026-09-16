@@ -25,10 +25,7 @@ class InfirmoApp extends StatelessWidget {
   );
 }
 
-/// Aiguille entre la connexion et la modification du profil selon la session.
-///
-/// La session (jeton) vit uniquement en mémoire dans [InfirmoApi] ; aucune
-/// donnée n'est persistée sur l'appareil.
+/// Aiguille entre connexion et profil selon la session.
 class AppRoot extends StatefulWidget {
   const AppRoot({super.key, required this.api});
 
@@ -47,7 +44,6 @@ class _AppRootState extends State<AppRoot> {
     super.dispose();
   }
 
-  /// Connexion puis chargement du profil. Retourne `null` si réussi.
   Future<String?> _signIn(String email, String password) async {
     try {
       await widget.api.login(email, password);
@@ -61,7 +57,6 @@ class _AppRootState extends State<AppRoot> {
     }
   }
 
-  /// Enregistrement du profil. Retourne `null` si réussi.
   Future<String?> _saveProfile(Profile profile) async {
     try {
       final saved = await widget.api.save(profile);
@@ -75,12 +70,11 @@ class _AppRootState extends State<AppRoot> {
     }
   }
 
-  /// Déconnexion : révoque la session côté serveur puis revient à la connexion.
   Future<void> _signOut() async {
     try {
       await widget.api.logout();
     } catch (_) {
-      // La session perdue expire côté serveur ; on revient à la connexion.
+      // Session déjà perdue : on revient à la connexion.
     }
     if (mounted) setState(() => _profile = null);
   }

@@ -2,14 +2,11 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_dimens.dart';
 
-/// Ossature commune d'un écran INFIRMO : fond crème, zone sûre, défilement
-/// vertical et largeur de contenu bornée pour les grands écrans.
+/// Ossature commune d'un écran INFIRMO.
 class AppScreen extends StatelessWidget {
   const AppScreen({super.key, required this.child, this.padding});
 
   final Widget child;
-
-  /// Rembourrage du contenu ; par défaut une marge horizontale de page.
   final EdgeInsets? padding;
 
   @override
