@@ -49,6 +49,12 @@ void main() {
         await tester.tap(button);
       }
 
+      Future<void> pressKey(Key key) async {
+        final button = find.byKey(key);
+        await tester.ensureVisible(button);
+        await tester.tap(button);
+      }
+
       Future<void> login() async {
         await tester.enterText(
           find.byKey(const Key('email')),
@@ -58,7 +64,7 @@ void main() {
           find.byKey(const Key('password')),
           'Infirmo-demo-2026!',
         );
-        await press('Se connecter');
+        await press('SE CONNECTER');
         await waitFor(find.byKey(const Key('city')));
       }
 
@@ -81,36 +87,24 @@ void main() {
         uiSignedIn = true;
         await tester.enterText(find.byKey(const Key('display_name')), name);
         await tester.enterText(find.byKey(const Key('city')), city);
-        await press('Enregistrer le profil');
+        await press('ENREGISTRER');
         await waitFor(find.textContaining('Profil enregistré.'));
-        await press('Se déconnecter');
-        await waitFor(find.text('Se connecter'));
+        await pressKey(const Key('signout'));
+        await waitFor(find.text('SE CONNECTER'));
         uiSignedIn = false;
 
         await tester.pumpWidget(const SizedBox());
         uiApi = InfirmoApi(baseUrl: baseUrl);
         await tester.pumpWidget(InfirmoApp(api: uiApi));
-        expect(find.text('Bienvenue sur INFIRMO'), findsOneWidget);
+        expect(find.text('SE CONNECTER'), findsOneWidget);
         await login();
         uiSignedIn = true;
-        expect(
-          tester
-              .widget<TextFormField>(find.byKey(const Key('display_name')))
-              .controller!
-              .text,
-          name,
-        );
-        expect(
-          tester
-              .widget<TextFormField>(find.byKey(const Key('city')))
-              .controller!
-              .text,
-          city,
-        );
+        expect(find.text(name), findsOneWidget);
+        expect(find.text(city), findsOneWidget);
         expect((await cleanup.profile()).displayName, name);
         expect(tester.takeException(), isNull);
-        await press('Se déconnecter');
-        await waitFor(find.text('Se connecter'));
+        await pressKey(const Key('signout'));
+        await waitFor(find.text('SE CONNECTER'));
         uiSignedIn = false;
       } finally {
         try {
