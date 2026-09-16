@@ -11,7 +11,7 @@ Cette version est réservée aux **données synthétiques**. Elle ne doit recevo
 
 ## Installation à froid v0.1
 
-Prérequis : Git, Docker Desktop démarré avec moteur Linux (ou Docker Engine sous Linux), plugin Compose v2 avec `--wait`, Python 3.12+ pour le contrôle d'acceptation, accès réseau aux registres de dépendances/images et accès en lecture à ce dépôt privé. Le SDK Flutter n'est pas nécessaire pour le parcours Docker. Le premier build télécharge le SDK et les dépendances : inclure ce temps dans la mesure. Vérifier `docker info`, `docker compose version` et `python --version` avant le chronomètre d'exécution; consigner séparément le temps d'installation des prérequis.
+Prérequis : Git, Docker Desktop démarré avec moteur Linux (ou Docker Engine sous Linux), plugin Compose v2 avec `--wait`, Python 3.12+ pour le contrôle d'acceptation, accès réseau aux registres de dépendances/images et accès en lecture à ce dépôt privé. Le SDK Flutter n'est pas nécessaire pour le parcours Docker. Le premier build télécharge le SDK et les dépendances : inclure ce temps dans la mesure. Vérifier `docker info`, `docker compose version` et `python --version` avant le chronomètre d'exécution; consigner séparément le temps d'installation des prérequis. L'image `db` (`postgis/postgis`) n'est publiée que pour `linux/amd64` : sur Mac Apple Silicon, activer Rosetta dans Docker Desktop (Settings → General → Use Rosetta) ; le service tourne alors en émulation, sans autre réglage.
 
 Les étapes numérotées suivantes constituent les **7 actions de référence** du protocole. Les commandes internes d'une étape ne sont pas recomptées séparément. Geler le commit et ce document avant toute tentative; consigner tout ajustement non prescrit dans le [Delta Log](reporting/delta-log.csv).
 
