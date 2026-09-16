@@ -48,11 +48,15 @@ void main() {
       );
       Future<void> login() async {
         await tester.enterText(
+          find.byKey(const Key('email')),
+          'demo@infirmo.example',
+        );
+        await tester.enterText(
           find.byKey(const Key('password')),
           'Infirmo-demo-2026!',
         );
-        await tester.ensureVisible(find.text('Se connecter'));
-        await tester.tap(find.text('Se connecter'));
+        await tester.ensureVisible(find.text('SE CONNECTER'));
+        await tester.tap(find.text('SE CONNECTER'));
         await tester.pumpAndSettle();
       }
 
@@ -64,8 +68,8 @@ void main() {
         'Alex Exemple',
       );
       await tester.enterText(find.byKey(const Key('city')), 'Metz');
-      await tester.ensureVisible(find.text('Enregistrer le profil'));
-      await tester.tap(find.text('Enregistrer le profil'));
+      await tester.ensureVisible(find.text('ENREGISTRER'));
+      await tester.tap(find.text('ENREGISTRER'));
       await tester.pumpAndSettle();
       expect(saved['display_name'], 'Alex Exemple');
       expect(saved['city'], 'Metz');
@@ -73,7 +77,7 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.pumpWidget(const SizedBox());
       await tester.pumpWidget(InfirmoApp(api: api()));
-      expect(find.text('Bienvenue sur INFIRMO'), findsOneWidget);
+      expect(find.text('SE CONNECTER'), findsOneWidget);
       await login();
       expect(find.text('Alex Exemple'), findsOneWidget);
       expect(find.text('Metz'), findsOneWidget);
@@ -98,8 +102,8 @@ void main() {
       }),
     );
     await tester.pumpWidget(InfirmoApp(api: api));
-    await tester.ensureVisible(find.text('Se connecter'));
-    await tester.tap(find.text('Se connecter'));
+    await tester.ensureVisible(find.text('SE CONNECTER'));
+    await tester.tap(find.text('SE CONNECTER'));
     await tester.pumpAndSettle();
     expect(requests, 0);
     expect(
@@ -114,9 +118,13 @@ void main() {
           .didExceedMaxLines,
       isFalse,
     );
+    await tester.enterText(
+      find.byKey(const Key('email')),
+      'demo@infirmo.example',
+    );
     await tester.enterText(find.byKey(const Key('password')), 'incorrect');
-    await tester.ensureVisible(find.text('Se connecter'));
-    await tester.tap(find.text('Se connecter'));
+    await tester.ensureVisible(find.text('SE CONNECTER'));
+    await tester.tap(find.text('SE CONNECTER'));
     await tester.pumpAndSettle();
     expect(requests, 1);
     expect(
