@@ -201,7 +201,6 @@ docs/<description>
 ci/<description>
 test/<description>
 refactor/<description>
-dev/<description>
 ```
 
 Exemples :
