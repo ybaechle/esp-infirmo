@@ -159,19 +159,19 @@ Les dossiers `mobile/`, `backend/`, `ia/` et `infra/` contiennent leurs sources 
 
 Les livrables principaux du projet sont centralisés dans le dossier `docs/livrables/`.
 
-| Livrable | Emplacement / support | Échéance |
-| -------- | --------------------- | -------- |
-| Cahier des charges | `docs/livrables/` | Juin 2026 |
-| Maquettes UI/UX MVP | `docs/livrables/maquettes/` + lien Figma | Juin 2026 |
+| Livrable | Emplacement / support | Échéance                     |
+| -------- | --------------------- |------------------------------|
+| Cahier des charges | `docs/livrables/` | Juin 2026                    |
+| Maquettes UI/UX MVP | `docs/livrables/maquettes/` + lien Figma | Juin 2026                    |
 | Backlog GitHub Projects | GitHub Projects | Juin 2026 puis suivi continu |
-| README principal | `README.md` | Juin 2026 |
-| Conventions projet | `CONTRIBUTING.md` | Juin 2026 |
-| Documentation technique | README par module + `docs/` | Mars 2027 |
-| Application mobile MVP | `mobile/` | Avril 2027 |
-| Backend API | `backend/` | Avril 2027 |
-| Service IA | `ia/` | Avril 2027 |
-| Infrastructure / DevOps | `infra/` | Avril 2027 |
-| Support de soutenance | Slides + démonstration | Avril 2027 |
+| README principal | `README.md` | Juin 2026                    |
+| Conventions projet | `CONTRIBUTING.md` | Juin 2026                    |
+| Documentation technique | README par module + `docs/` | Mars 2027                    |
+| Application mobile MVP | `mobile/` | Mars 2027                    |
+| Backend API | `backend/` | Mars 2027                    |
+| Service IA | `ia/` | Mars 2027                    |
+| Infrastructure / DevOps | `infra/` | Mars 2027                      |
+| Support de soutenance | Slides + démonstration | Avril 2027                   |
 
 ---
 
@@ -221,15 +221,15 @@ Un ticket peut donc appartenir à un milestone fonctionnel tout en étant trait�
 
 ## 8. Planning macro
 
-| Milestone | Période | Objectif principal | Livrable clé |
-| --------- | ------- | ----------------- | ------------ |
-| M1 - Spécifications | Fév. - Juin 2026 | Cahier des charges, maquettes Figma, backlog, architecture, préparation du dépôt | Docs + maquettes + backlog |
-| M2 - MVP Core | Sept. - Nov. 2026 | Authentification, profils, documents, matching, socle mobile/backend | MVP fonctionnel |
-| M3 - Remplacements | Déc. 2026 | Publication de tournées, candidatures, calendrier, statuts de mission | Module remplacements |
-| M4 - Communication | Oct. 2026 - Jan. 2027 | Messagerie sécurisée, transmissions, vocaux, transcription IA, notifications | Module communication |
-| M5 - Mobile & IA | Fév. - Mars 2027 | Tests, intégration, optimisation mobile/backend/IA, stabilisation | App mobile + IA stabilisées |
-| M6 - Sécurité & Deploy | Mars 2027 | Sécurité, RGPD, HDS, déploiement candidat, documentation finale | Version candidate avant réserve |
-| Réserve | Avril 2027 | Corrections, stabilisation, ajustements finaux et soutenance | Démo finale + soutenance |
+| Milestone | Période                          | Objectif principal | Livrable clé |
+| --------- |----------------------------------| ----------------- | ------------ |
+| M1 - Spécifications | Fév. - Juin 2026                 | Cahier des charges, maquettes Figma, backlog, architecture, préparation du dépôt | Docs + maquettes + backlog |
+| M2 - MVP Core | Sept. - Nov. 2026                | Authentification, profils, documents, matching, socle mobile/backend | MVP fonctionnel |
+| M3 - Remplacements | Déc. 2026                        | Publication de tournées, candidatures, calendrier, statuts de mission | Module remplacements |
+| M4 - Communication | Oct. 2026 - Jan. 2027            | Messagerie sécurisée, transmissions, vocaux, transcription IA, notifications | Module communication |
+| M5 - Mobile & IA | Fév. - Mars 2027                 | Tests, intégration, optimisation mobile/backend/IA, stabilisation | App mobile + IA stabilisées |
+| M6 - Sécurité & Deploy | Mars 2027  | Sécurité, RGPD, HDS, déploiement candidat, documentation finale | Version candidate avant réserve |
+| Réserve | Avril 2027                       | Corrections, stabilisation, ajustements finaux et soutenance | Démo finale + soutenance |
 
 ---
 
@@ -243,7 +243,7 @@ Un ticket peut donc appartenir à un milestone fonctionnel tout en étant trait�
 | Sprint 4 | 29/01/2027 - 05/03/2027 | Tests, intégration, sécurité, optimisation et stabilisation de l’application. |
 | Sprint 5 | 12/03/2027 - 19/03/2027 | Clôture opérationnelle : documentation technique, passation, livraison candidate. |
 
-Avril 2027 est conservé comme réserve de finalisation. Cette période permet d’absorber les retards éventuels, de corriger les anomalies, de stabiliser la démonstration et de préparer la soutenance.
+La version candidate (M6) est livrée au plus tard le **31/03/2027**. Avril 2027 est conservé comme réserve de finalisation. Cette période permet d’absorber les retards éventuels, de corriger les anomalies, de stabiliser la démonstration et de préparer la soutenance.
 
 ---
 

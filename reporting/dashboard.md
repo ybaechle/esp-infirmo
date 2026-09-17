@@ -23,8 +23,8 @@ Les estimations initiales sont celles des tickets complets du cadrage. Les cellu
 | MOB-2 | Maxence Noizet | 28.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 | YB-1 | Yohan Baechle | 21.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 | YB-4 | Yohan Baechle | 28.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| LC-1 | Louis Chenot | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
-| LC-2 | Louis Chenot | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| LC-1 | Lothaire Nobili | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
+| LC-2 | Lothaire Nobili | 10.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 | ZT-2 | Ziad Tiarimti | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 | IA-02 | Pierre-Arthur Toutouom Yountebo | 3.50 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |
 | IA-03 | Pierre-Arthur Toutouom Yountebo | 7.00 | Non mesuré | Non mesuré | Non mesuré | Non mesuré | Non mesuré | In Progress |

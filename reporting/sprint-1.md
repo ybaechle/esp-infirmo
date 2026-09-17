@@ -37,11 +37,11 @@ Les responsables suivent les rôles du cadrage. Ces échéances sont inscrites a
 
 | Action | Responsable unique | Échéance (Europe/Paris) | Critère de fermeture |
 | --- | --- | --- | --- |
-| Rapprocher la capacite des cinq sprints avec le budget PDF et confirmer M6 mars/avril | Tetiana Lombardi | 16/09/2026 18:00 | Allocation de jours/tickets par sprint, reserve distincte et decision de roadmap sourcees |
+| Rapprocher la capacite des cinq sprints avec le budget PDF et confirmer M6 mars/avril | Tetiana Lombardi | 16/09/2026 18:00 | Allocation de jours/tickets par sprint, reserve distincte et decision de roadmap sourcees. M6 mars/avril tranché le 17/09/2026 : clôture au 31/03/2027 (DL-014); allocation par sprint encore ouverte |
 | Retrouver le Project et relier le backlog courant | Tetiana Lombardi | 16/09/2026 18:00 | URL accessible, tickets/WBS, responsables et engagement du sprint vérifiés |
 | Fournir les heures réelles et ETC de chaque tâche active | Tetiana Lombardi, consolidation | 16/09/2026 18:00 puis chaque jour projet | Déclarations des sept responsables; tableau recalculé |
 | Faire débloquer le budget Actions et appliquer les rulesets | Lazaro Marrero Rousse | 17/09/2026 18:00 | Administrateur identifié; contrôles exécutés; relecture API des deux protections |
-| Faire relire les choix d'authentification de démonstration | Louis Chenot | 18/09/2026 18:00 | Revue ADR 0003 et tests d'autorisation |
+| Faire relire les choix d'authentification de démonstration | Lothaire Nobili | 18/09/2026 18:00 | Revue ADR 0003 et tests d'autorisation |
 | Vérifier la migration et la persistance PostgreSQL | Ziad Tiarimti | 18/09/2026 18:00 | Migration à partir d'une base vide et reprise sans perte |
 | Valider le parcours Flutter et les écrans sur appareil | Maxence Noizet | 21/09/2026 18:00 | Tests et essai appareil; limites web/Android explicites |
 | Organiser le test à froid avec un pair extérieur | Yohan Baechlé | 22/09/2026 18:00 | Fiche onboarding complétée par le testeur |
