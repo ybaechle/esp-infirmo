@@ -18,7 +18,7 @@ Les étapes numérotées suivantes constituent les **7 actions de référence** 
 1. **Cloner la branche de livraison**, puis relever la révision. Les commandes fonctionnent dans PowerShell et dans un shell Linux/macOS.
 
    ```bash
-   git clone --branch feature/t9-executable-reporting --single-branch https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1.git infirmo
+   git clone https://github.com/EpitechMscProPromo2027/T-ESP-901-NCY-9-1-T-ESP-901-1.git infirmo
    cd infirmo
    git rev-parse HEAD
    ```
@@ -254,7 +254,7 @@ Avril 2027 est conservé comme réserve de finalisation. Cette période permet d
 | Tetiana Lombardi | Cheffe de projet / UI-UX |
 | Maxence Noizet | Dev Mobile Flutter |
 | Yohan Baechlé | Dev Fullstack |
-| Louis Chenot | Dev Backend |
+| Lothaire Nobili | Dev Backend |
 | Ziad Tiarimti | Dev Backend |
 | Pierre-Arthur Toutouom Yountebo | Dev IA |
 | Lazaro Marrero Rousse | DevOps |
