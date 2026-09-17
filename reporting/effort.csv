@@ -22,16 +22,16 @@ YB-6,Support PostgreSQL/PostGIS et requêtes métier,Yohan Baechle,14.0,,,,,Unve
 YB-7,Tests d'intégration fullstack Auth / Profil / Matching,Yohan Baechle,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 YB-8,Validation performance mobile et API côté intégration,Yohan Baechle,8.4,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 YB-9,Documentation technique fullstack,Yohan Baechle,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-1,Architecture API et conventions REST,Louis Chenot,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-2,"JWT, sessions et refresh tokens",Louis Chenot,10.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-3,Workflow candidature et acceptation,Louis Chenot,17.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-4,Statuts des missions et transitions,Louis Chenot,10.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-5,Messagerie texte/photo sécurisée backend,Louis Chenot,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-6,Transmissions sécurisées patients,Louis Chenot,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-7,WebSocket temps réel,Louis Chenot,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-8,Tests API communication/remplacements,Louis Chenot,15.4,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-9,Documentation OpenAPI backend,Louis Chenot,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-LC-10,Audit logs backend pour accès sensibles,Louis Chenot,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+LC-1,Architecture API et conventions REST,Lothaire Nobili,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-2,"JWT, sessions et refresh tokens",Lothaire Nobili,10.5,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-3,Workflow candidature et acceptation,Lothaire Nobili,17.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-4,Statuts des missions et transitions,Lothaire Nobili,10.5,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-5,Messagerie texte/photo sécurisée backend,Lothaire Nobili,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-6,Transmissions sécurisées patients,Lothaire Nobili,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-7,WebSocket temps réel,Lothaire Nobili,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-8,Tests API communication/remplacements,Lothaire Nobili,15.4,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-9,Documentation OpenAPI backend,Lothaire Nobili,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
+LC-10,Audit logs backend pour accès sensibles,Lothaire Nobili,14.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
 ZT-1,Architecture API partagée et conventions backend,Ziad Tiarimti,7.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 ZT-2,Setup PostgreSQL + PostGIS et migration initiale,Ziad Tiarimti,7.0,,,,,In Progress,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 ZT-3,Modèles métier remplacements et santé,Ziad Tiarimti,21.0,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
@@ -78,7 +78,7 @@ INF-18,README infra et documentation DevOps,Lazaro Marrero Rousse,13.3,13.3,,,,I
 MEET-TL,Réunions projet et coordination,Tetiana Lombardi,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 MEET-MN,Réunions projet et coordination,Maxence Noizet,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 MEET-YB,Réunions projet et coordination,Yohan Baechle,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
-MEET-LC,Réunions projet et coordination,Louis Chenot,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
+MEET-LC,Réunions projet et coordination,Lothaire Nobili,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported; owner reassigned from Louis Chenot to Lothaire Nobili in September 2026
 MEET-ZT,Réunions projet et coordination,Ziad Tiarimti,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 MEET-PAT,Réunions projet et coordination,Pierre-Arthur Toutouom Yountebo,9.1,,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; current human effort unreported
 MEET-LMR,Réunions projet et coordination,Lazaro Marrero Rousse,9.1,9.1,,,,Unverified,,2026-09-15,CDC v4 pp28-31; initial whole-ticket estimate; Lazaro Marrero Rousse confirmed 147 h actual total on 2026-09-15; retrospective allocation matching planned hours; ETC unreported; Signed: Lazaro Marrero Rousse (2026-09-15)

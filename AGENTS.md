@@ -9,7 +9,7 @@ INFIRMO is a French-facing Flutter application for independent nurses. The sourc
 | Tetiana Lombardi | Product, Figma, backlog, reporting |
 | Maxence Noizet | Flutter mobile |
 | Yohan Baechlé | Fullstack integration |
-| Louis Chenot | Backend |
+| Lothaire Nobili | Backend |
 | Ziad Tiarimti | Backend |
 | Pierre-Arthur Toutouom Yountebo | IA |
 | Lazaro Marrero Rousse | Infrastructure and CI/CD |

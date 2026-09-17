@@ -13,7 +13,7 @@ Source : page 26, section 7.2; confirmation page 31, section 7.6. Conversion pre
 | Tetiana Lombardi | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 7 |
 | Maxence Noizet | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 9 |
 | Yohan Baechlé | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 10 |
-| Louis Chenot | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 11 |
+| Lothaire Nobili  | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 11 |
 | Ziad Tiarimti | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 12 |
 | Pierre-Arthur Toutouom Yountebo | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 15 |
 | Lazaro Marrero Rousse | 137.9 | 9.1 | 147 | 31.5 | 178.5 | 19 |
@@ -50,7 +50,7 @@ Ne pas remplir automatiquement les cinq sprints avec 35 h par personne : cela fe
 - Page 34, section 9.2 : daily de 15 min; planning au debut du sprint, revue et retrospective en fin de sprint, chacun de 20 min. Il s'agit de la cadence prevue; aucune presence ou duree reelle n'est attestee.
 - Page 35 : GitHub Projects est le suivi operationnel; les pages 45-46 demandent des tickets assignes, une revue de code et une validation en staging selon la DoD. Les tableaux du PDF ne remplacent pas leurs preuves d'execution.
 - Page 43 : cible de couverture de 70% du coeur backend et pipeline de moins de 15 min. Ces seuils ne sont pas des mesures deja obtenues.
-- **Ecart de calendrier source :** le PDF page 36 place M6 Securite/Deploy en avril 2027, alors que le README place M6 en mars et avril en reserve. La page 26 du PDF nomme deja avril comme reserve de finalisation. Tetiana doit confirmer une seule interpretation et tracer l'arbitrage dans la roadmap; conserver le PDF source sans le reecrire retrospectivement.
+- **Ecart de calendrier source :** le PDF page 36 place M6 Securite/Deploy en avril 2027, alors que le README place M6 en mars et avril en reserve. La page 26 du PDF nomme deja avril comme reserve de finalisation. **Arbitrage du 17/09/2026 (Tetiana Lombardi) :** M6 est clos au plus tard le 31/03/2027; avril 2027 reste une reserve sans travail planifie, mais préparation à la soutenance. Le README et CONTRIBUTING font foi; le PDF source n'est pas reecrit retrospectivement (DL-014).
 
 ## Ce qui manque encore pour calculer la variance
 
