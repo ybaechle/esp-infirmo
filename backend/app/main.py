@@ -11,9 +11,11 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.demo import router
+from app.errors import ApiError, api_error_handler
 
 app = FastAPI(title="infirmo-backend", version="0.1.0")
 app.include_router(router)
+app.add_exception_handler(ApiError, api_error_handler)
 
 
 @app.exception_handler(RequestValidationError)
