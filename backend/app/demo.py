@@ -1,7 +1,6 @@
 """Synthetic-only authentication. Not production healthcare authentication."""
 
 import hashlib
-import hmac
 import os
 import secrets
 import time
@@ -15,6 +14,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.database import Account, LoginSession, get_db
+from app.passwords import DUMMY_HASH, verify_password
 
 
 def require_demo():
@@ -56,22 +56,6 @@ class Profile(BaseModel):
         return value
 
 
-def hash_password(password: str, salt: bytes | None = None) -> str:
-    salt = salt or secrets.token_bytes(16)
-    digest = hashlib.scrypt(
-        password.encode(), salt=salt, n=2**15, r=8, p=1, maxmem=64 * 1024 * 1024
-    )
-    return f"{salt.hex()}:{digest.hex()}"
-
-
-def verify_password(password: str, encoded: str) -> bool:
-    salt = bytes.fromhex(encoded.split(":", 1)[0])
-    return hmac.compare_digest(hash_password(password, salt), encoded)
-
-
-_DUMMY_HASH = hash_password("synthetic-unknown-account")
-
-
 def throttle_login():
     # ponytail: 30 attempts/minute globally; use per-account/IP limits for a multi-user service.
     try:
@@ -91,7 +75,7 @@ def throttle_login():
 def login(body: LoginInput, db: DB):
     account = db.scalar(select(Account).where(Account.email == body.email))
     valid = verify_password(
-        body.password, account.password_hash if account else _DUMMY_HASH
+        body.password, account.password_hash if account else DUMMY_HASH
     )
     if not valid or account is None:
         raise HTTPException(401, "Invalid credentials")

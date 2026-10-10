@@ -7,7 +7,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.database import Account, get_engine
-from app.demo import LoginInput, hash_password
+from app.demo import LoginInput
+from app.passwords import hash_password
 
 
 def seed_demo(db: Session):

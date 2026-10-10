@@ -14,7 +14,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy.pool import StaticPool
 
 from app.database import Account, Base, LoginSession, get_db, get_engine
-from app.demo import hash_password, throttle_login, verify_password
+from app.demo import throttle_login
+from app.passwords import hash_password, verify_password
 from app.main import app
 from app.seed_demo import main, seed_demo
 
