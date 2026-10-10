@@ -27,7 +27,7 @@ def test_migrations_and_persisted_journey(monkeypatch):
     admin = create_engine(url, hide_parameters=True)
     with admin.begin() as connection:
         connection.execute(text(f'CREATE SCHEMA "{schema}"'))
-    scoped_url = url.update_query_dict({"options": f"-csearch_path={schema}"})
+    scoped_url = url.update_query_dict({"options": f"-csearch_path={schema},public"})
     monkeypatch.setenv("DATABASE_URL", scoped_url.render_as_string(hide_password=False))
     monkeypatch.setenv("INFIRMO_DEMO_MODE", "true")
     get_engine.cache_clear()
@@ -62,6 +62,40 @@ def test_migrations_and_persisted_journey(monkeypatch):
             assert client.get("/api/profile", headers=auth).status_code == 401
         command.downgrade(Config("alembic.ini"), "base")
         command.upgrade(Config("alembic.ini"), "head")
+    finally:
+        get_engine().dispose()
+        get_engine.cache_clear()
+        with admin.begin() as connection:
+            connection.execute(text(f'DROP SCHEMA "{schema}" CASCADE'))
+        admin.dispose()
+
+
+@pytest.mark.postgres
+@pytest.mark.skipif(
+    not os.environ.get("TEST_DATABASE_URL"),
+    reason="TEST_DATABASE_URL not set; real PostgreSQL check not executed",
+)
+def test_postgis_enabled_by_migration_answers_geographic_queries(monkeypatch):
+    url = make_url(os.environ["TEST_DATABASE_URL"]).set(drivername="postgresql+psycopg")
+    schema = "test_" + uuid.uuid4().hex
+    admin = create_engine(url, hide_parameters=True)
+    with admin.begin() as connection:
+        connection.execute(text(f'CREATE SCHEMA "{schema}"'))
+    scoped = url.update_query_dict({"options": f"-csearch_path={schema},public"})
+    monkeypatch.setenv("DATABASE_URL", scoped.render_as_string(hide_password=False))
+    get_engine.cache_clear()
+    try:
+        command.upgrade(Config("alembic.ini"), "head")
+        with get_engine().connect() as connection:
+            # Nancy -> Metz : environ 47 km à vol d'oiseau.
+            meters = connection.scalar(
+                text(
+                    "SELECT ST_Distance("
+                    "ST_MakePoint(6.1844, 48.6921)::geography,"
+                    "ST_MakePoint(6.1757, 49.1193)::geography)"
+                )
+            )
+        assert 46_000 < meters < 49_000
     finally:
         get_engine().dispose()
         get_engine.cache_clear()
