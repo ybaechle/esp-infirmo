@@ -5,9 +5,11 @@ description = "API Infirmo — parcours de démonstration synthétique T9"
 requires-python = ">=3.12"
 dependencies = [
     "alembic~=1.18.4",
+    "cryptography~=50.0.2",
     "fastapi~=0.139.0",
     "prometheus-fastapi-instrumentator~=8.0.2",
     "psycopg[binary]~=3.3.4",
+    "python-multipart~=0.0.32",
     "redis~=8.0.1",
     "sqlalchemy~=2.0.48",
     "uvicorn[standard]~=0.49.0",
