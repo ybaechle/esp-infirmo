@@ -6,6 +6,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
+from app.ratelimit import get_counter
 
 
 @pytest.fixture
@@ -25,12 +26,22 @@ def db(db_engine):
 
 
 @pytest.fixture
-def client(db_engine):
+def counts():
+    return {}
+
+
+@pytest.fixture
+def client(db_engine, counts):
+    def counter(key, window):
+        counts[key] = counts.get(key, 0) + 1
+        return counts[key]
+
     def session():
         with Session(db_engine) as s:
             yield s
 
     app.dependency_overrides[get_db] = session
+    app.dependency_overrides[get_counter] = lambda: counter
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()

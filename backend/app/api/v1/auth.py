@@ -12,6 +12,7 @@ from app.api.deps import DB, CurrentSession, CurrentUser
 from app.errors import ApiError
 from app.models import User
 from app.passwords import DUMMY_HASH, hash_password, verify_password
+from app.ratelimit import Limiter
 from app.services import sessions
 from app.services.ordre import OrdreUnavailable, OrdreVerifier, get_ordre_verifier
 
@@ -57,7 +58,8 @@ class UserPublic(BaseModel):
 
 
 @router.post("/register", response_model=UserPublic, status_code=201)
-def register(body: RegisterInput, db: DB, ordre: Ordre):
+def register(body: RegisterInput, db: DB, ordre: Ordre, throttle: Limiter):
+    throttle.check("register", throttle.ip, 10)
     try:
         order_ok = ordre.is_valid(body.order_number)
     except OrdreUnavailable:
@@ -119,7 +121,9 @@ class TokenOutput(BaseModel):
 
 
 @router.post("/login", response_model=TokenOutput)
-def login(body: LoginInput, db: DB):
+def login(body: LoginInput, db: DB, throttle: Limiter):
+    throttle.check("login-ip", throttle.ip, 30)
+    throttle.check("login-email", body.email, 5)
     user = db.scalar(select(User).where(User.email == body.email))
     valid = verify_password(body.password, user.password_hash if user else DUMMY_HASH)
     if not valid or user is None:
