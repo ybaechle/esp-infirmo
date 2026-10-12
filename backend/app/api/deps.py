@@ -43,3 +43,21 @@ def current_user(db: DB, session: Annotated[AuthSession, Depends(current_session
 
 CurrentSession = Annotated[AuthSession, Depends(current_session)]
 CurrentUser = Annotated[User, Depends(current_user)]
+
+
+def require_role(*roles: str):
+    def dependency(user: CurrentUser):
+        if user.role not in roles:
+            raise ApiError(403, "forbidden_role", "Role not allowed")
+        return user
+
+    return dependency
+
+
+def require_admin(user: CurrentUser):
+    if not user.is_admin:
+        raise ApiError(403, "admin_required", "Administrator required")
+    return user
+
+
+AdminUser = Annotated[User, Depends(require_admin)]
