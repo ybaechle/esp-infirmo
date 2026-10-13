@@ -17,6 +17,9 @@ class User(Base):
         CheckConstraint(
             "status IN ('active', 'suspended', 'deleted')", name="ck_users_status"
         ),
+        CheckConstraint(
+            "two_factor_channel IN ('email', 'sms')", name="ck_users_two_factor_channel"
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -27,6 +30,8 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(20))
     order_number: Mapped[str] = mapped_column(String(11), unique=True)
     status: Mapped[str] = mapped_column(String(20), default="active")
+    phone: Mapped[str | None] = mapped_column(String(20))
+    two_factor_channel: Mapped[str | None] = mapped_column(String(5))
     is_admin: Mapped[bool] = mapped_column(default=False)
     consented_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(

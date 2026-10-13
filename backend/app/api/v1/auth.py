@@ -13,7 +13,7 @@ from app.errors import ApiError
 from app.models import User
 from app.passwords import DUMMY_HASH, hash_password, verify_password
 from app.ratelimit import Limiter
-from app.services import sessions
+from app.services import otp, sessions
 from app.services.ordre import OrdreUnavailable, OrdreVerifier, get_ordre_verifier
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -120,8 +120,24 @@ class TokenOutput(BaseModel):
     token_type: str
 
 
-@router.post("/login", response_model=TokenOutput)
-def login(body: LoginInput, db: DB, throttle: Limiter):
+class LoginOutput(BaseModel):
+    """Soit la paire de jetons, soit un défi 2FA à valider via `/auth/2fa/verify`."""
+
+    two_factor_required: bool = False
+    challenge_id: uuid.UUID | None = None
+    access_token: str | None = None
+    refresh_token: str | None = None
+    expires_in: int | None = None
+    token_type: str | None = None
+
+
+@router.post("/login", response_model=LoginOutput)
+def login(
+    body: LoginInput,
+    db: DB,
+    throttle: Limiter,
+    sender: Annotated[otp.OtpSender, Depends(otp.get_otp_sender)],
+):
     throttle.check("login-ip", throttle.ip, 30)
     throttle.check("login-email", body.email, 5)
     user = db.scalar(select(User).where(User.email == body.email))
@@ -130,6 +146,15 @@ def login(body: LoginInput, db: DB, throttle: Limiter):
         raise ApiError(401, "invalid_credentials", "Invalid credentials")
     if user.status != "active":
         raise ApiError(403, "account_inactive", "Account inactive")
+    if user.two_factor_channel:
+        challenge_id = otp.start_challenge(
+            db, user, "login", user.two_factor_channel, sender
+        )
+        return LoginOutput(two_factor_required=True, challenge_id=challenge_id)
+    return _open_session(db, user)
+
+
+def _open_session(db, user):
     sessions.purge_expired(db)
     pair = sessions.issue(db, user.id)
     db.commit()
