@@ -45,3 +45,12 @@ def client(db_engine, counts):
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def encryption_keys(monkeypatch):
+    import base64
+
+    key = base64.b64encode(b"k" * 32).decode()
+    monkeypatch.setenv("INFIRMO_ENCRYPTION_KEYS", f"test:{key}")
+    return key

@@ -11,6 +11,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.v1 import router as api_v1
+from app.crypto import EncryptionUnavailable
 from app.demo import router
 from app.errors import ApiError, api_error_handler
 
@@ -23,6 +24,14 @@ app.add_exception_handler(ApiError, api_error_handler)
 @app.exception_handler(RequestValidationError)
 async def invalid_request(request, exc):
     return JSONResponse(status_code=422, content={"detail": "Invalid request"})
+
+
+@app.exception_handler(EncryptionUnavailable)
+async def encryption_unavailable(request, exc):
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "Service unavailable", "code": "encryption_unavailable"},
+    )
 
 
 @app.exception_handler(SQLAlchemyError)
