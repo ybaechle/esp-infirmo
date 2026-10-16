@@ -52,3 +52,20 @@ def offer_payload(days_ahead=10, **overrides):
         "care_codes": [],
     }
     return {**body, **overrides}
+
+
+def luhn_check_digit(prefix: str) -> str:
+    total = 0
+    for index, char in enumerate(reversed(prefix)):
+        digit = int(char)
+        if index % 2 == 0:
+            digit *= 2
+            if digit > 9:
+                digit -= 9
+        total += digit
+    return str((10 - total % 10) % 10)
+
+
+def siret(n: int) -> str:
+    prefix = f"{n:013d}"
+    return prefix + luhn_check_digit(prefix)
