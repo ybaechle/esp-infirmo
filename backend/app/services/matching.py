@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.geo import distance, within
 from app.models import (
+    Application,
     Availability,
     NursingOffice,
     Offer,
@@ -119,6 +120,9 @@ def search(db: Session, user: User, filters: Filters) -> list[Match]:
         Offer.valid_till > now,
         ~exists().where(
             OfficeMember.office_id == Offer.office_id, OfficeMember.user_id == user.id
+        ),
+        ~exists().where(
+            Application.offer_id == Offer.id, Application.user_id == user.id
         ),
     ]
     if filters.care_ids:

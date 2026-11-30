@@ -1,3 +1,4 @@
+from app.models.application import Application
 from app.models.availability import Availability
 from app.models.document import Document
 from app.models.office import NursingOffice, OfficeMember
@@ -8,6 +9,7 @@ from app.models.two_factor import TwoFactorChallenge
 from app.models.user import User
 
 __all__ = [
+    "Application",
     "AuthSession",
     "Availability",
     "Care",

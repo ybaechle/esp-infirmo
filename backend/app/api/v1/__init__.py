@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     admin,
+    applications,
     auth,
     documents,
     matching,
@@ -19,4 +20,5 @@ router.include_router(documents.router)
 router.include_router(offices.router)
 router.include_router(matching.router)
 router.include_router(offers.router)
+router.include_router(applications.router)
 router.include_router(admin.router)
