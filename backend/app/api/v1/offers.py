@@ -8,6 +8,7 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    computed_field,
     field_validator,
     model_validator,
 )
@@ -65,6 +66,12 @@ class OfferPublic(BaseModel):
     turnover: int
     status: str
     cares: list[CarePublic]
+
+    @computed_field
+    @property
+    def expired(self) -> bool:
+        """Offre restée ouverte après sa date limite : plus candidatable, sans statut stocké."""
+        return self.status == "open" and as_utc(self.valid_till) <= utcnow()
 
 
 def resolve_cares(db, codes: list[str]) -> list[Care]:
