@@ -6,6 +6,7 @@ from app.api.v1 import (
     auth,
     documents,
     matching,
+    messages,
     missions,
     offers,
     offices,
@@ -23,4 +24,5 @@ router.include_router(matching.router)
 router.include_router(offers.router)
 router.include_router(applications.router)
 router.include_router(missions.router)
+router.include_router(messages.router)
 router.include_router(admin.router)
